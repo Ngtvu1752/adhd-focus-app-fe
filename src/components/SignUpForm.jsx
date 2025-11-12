@@ -127,7 +127,7 @@ const SignUpForm = () => {
         <button 
           type="submit"
           disabled={loading}
-          className="rounded-[25px] border-none bg-gradient-to-br from-overlay-start to-overlay-end text-white text-sm font-semibold py-3.5 px-12 tracking-wider uppercase transition-all duration-300 cursor-pointer shadow-[0_5px_15px_rgba(74,144,226,0.4)] hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(74,144,226,0.6)] active:-translate-y-0.5 w-full max-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-[25px] border-none bg-login-accent from-overlay-start to-overlay-end text-white text-sm font-semibold py-3.5 px-12 tracking-wider uppercase transition-all duration-300 cursor-pointer shadow-[0_5px_15px_rgba(74,144,226,0.4)] hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(74,144,226,0.6)] active:-translate-y-0.5 w-full max-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Đang đăng ký...' : 'Đăng Ký'}
         </button>
