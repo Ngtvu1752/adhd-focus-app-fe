@@ -1,0 +1,18 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Nền chính */
+  --color-bg-primary: #E8F5FF;
+  /* Màu phụ */
+  --color-secondary:   #DFF7E8;
+  /* Màu trung tính */
+  --color-neutral-light: #F7F4EE;
+  /* Accent / Call-to-action */
+  --color-accent:      #FFD966;
+  /* Text chính */
+  --color-text-primary: #333333;
+}
+
