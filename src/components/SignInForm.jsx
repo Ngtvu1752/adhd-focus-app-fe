@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const SignInForm = () => {
+const SignInForm = ({ isParent, setIsParent }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ const SignInForm = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(email, password, isParent);
       navigate('/app');
     } catch (err) {
       setError('Login failed. Please try again.');
@@ -59,6 +59,8 @@ const SignInForm = () => {
           type="email" 
           placeholder=" " 
           required 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full py-4 px-5 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 bg-neutral-light focus:outline-none focus:border-accent focus:bg-white focus:-translate-y-0.5 focus:shadow-[0_5px_15px_rgba(255,217,102,0.2)] peer"
         />
         <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
@@ -80,9 +82,22 @@ const SignInForm = () => {
         </label>
       </div>
       
-      <a href="#" className="text-text-primary no-underline my-4 text-[13px] transition-all duration-300 hover:text-accent hover:underline">
-        Quên mật khẩu?
-      </a>
+      <div className="w-full flex justify-between items-center my-4">
+        <label htmlFor="isParentCheckSignIn" className="flex items-center gap-2 cursor-pointer text-text-primary/80 text-[13px]">
+          <input 
+            type="checkbox"
+            id="isParentCheckSignIn"
+            checked={isParent}
+            onChange={(e) => setIsParent(e.target.checked)}
+            className="w-4 h-4"
+          />
+          Tôi là phụ huynh
+        </label>
+        
+        <a href="#" className="text-text-primary no-underline text-[13px] transition-all duration-300 hover:text-login-accent hover:underline">
+          Quên mật khẩu?
+        </a>
+      </div>
       
       {/* Cập nhật nút "Đăng Nhập" */}
       <button 

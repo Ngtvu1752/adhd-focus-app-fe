@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const SignUpForm = () => {
+const SignUpForm = ({ isParent, setIsParent }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +29,7 @@ const SignUpForm = () => {
     setLoading(true);
 
     try {
-      await signup(name, email, password);
+      await signup(name, email, password, isParent);
       navigate('/app');
     } catch (err) {
       setError('Đăng ký thất bại. Vui lòng thử lại.');
@@ -119,6 +119,18 @@ const SignUpForm = () => {
           />
           <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
             Nhập lại mật khẩu
+          </label>
+        </div>
+        <div className="w-full mb-6">
+          <label htmlFor="isParentCheckSignUp" className="flex items-center gap-2 cursor-pointer text-text-primary/80">
+            <input 
+              type="checkbox"
+              id="isParentCheckSignUp" // Đổi ID
+              checked={isParent}
+              onChange={(e) => setIsParent(e.target.checked)}
+              className="w-4 h-4"
+            />
+            Tôi là phụ huynh
           </label>
         </div>
         
