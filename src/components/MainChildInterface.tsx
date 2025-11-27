@@ -215,13 +215,13 @@ export function MainChildInterface() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #E8F5FF 0%, #DFF7E8 100%)' }}>
-      <div className="flex h-screen">
+    <div className="h-full" style={{ background: 'linear-gradient(135deg, #E8F5FF 0%, #DFF7E8 100%)' }}>
+      <div className="flex h-full">
         {/* Gamification Sidebar - Hidden in Focus Mode */}
         <AnimatePresence>
           {!focusMode && (
             <motion.div
-              className="w-80 border-r p-6 overflow-y-auto"
+              className="w-80 border-r p-4 h-full overflow-hidden flex flex-col shrink-0"
               style={{ backgroundColor: 'white' }}
               initial={{ x: -320 }}
               animate={{ x: 0 }}
@@ -229,9 +229,9 @@ export function MainChildInterface() {
               transition={{ type: 'spring', damping: 25 }}
             >
               {/* User Level Card */}
-              <Card className="p-6 rounded-2xl border-0 mb-6" style={{ backgroundColor: '#FFD966' }}>
+              <Card className="p-4 rounded-2xl border-0 mb-4" style={{ backgroundColor: '#FFD966' }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'white' }}>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'white' }}>
                     <Trophy className="w-8 h-8" style={{ color: '#FFD966' }} />
                   </div>
                   <div>
@@ -252,55 +252,51 @@ export function MainChildInterface() {
               </Card>
 
               {/* Points Card */}
-              <Card className="p-6 rounded-2xl border-0 mb-6" style={{ backgroundColor: '#E8F5FF' }}>
-                <div className="flex items-center justify-between mb-3">
+              <Card className="p-4 rounded-2xl border-0 mb-4" style={{ backgroundColor: '#E8F5FF' }}>
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Star className="w-6 h-6" style={{ color: '#FFD966', fill: '#FFD966' }} />
+                    <Star className="w-5 h-5" style={{ color: '#FFD966', fill: '#FFD966' }} />
                     <h3 style={{ color: '#333333' }}>Total Points</h3>
                   </div>
                   <p className="text-2xl" style={{ color: '#333333' }}>{userProgress.totalPoints}</p>
                 </div>
               </Card>
 
-              {/* Stats Cards */}
-              <div className="space-y-4 mb-6">
-                <Card className="p-4 rounded-xl border-0" style={{ backgroundColor: '#DFF7E8' }}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-5 h-5" style={{ color: '#333333' }} />
-                      <span style={{ color: '#333333' }}>Sessions</span>
-                    </div>
-                    <p style={{ color: '#333333' }}>{userProgress.totalSessions}</p>
+              {/* Stats Cards - SỬA 5: Chuyển sang Grid 2 cột để tiết kiệm chiều cao */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <Card className="p-3 rounded-xl border-0" style={{ backgroundColor: '#DFF7E8' }}>
+                  <div className="flex flex-col items-center text-center">
+                    <Zap className="w-5 h-5 mb-1" style={{ color: '#333333' }} />
+                    <span className="text-xs text-gray-600">Sessions</span>
+                    <p className="text-lg font-bold" style={{ color: '#333333' }}>{userProgress.totalSessions}</p>
                   </div>
                 </Card>
 
-                <Card className="p-4 rounded-xl border-0" style={{ backgroundColor: '#F7F4EE' }}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span>🔥</span>
-                      <span style={{ color: '#333333' }}>Streak</span>
-                    </div>
-                    <p style={{ color: '#333333' }}>{userProgress.streak} days</p>
+                <Card className="p-3 rounded-xl border-0" style={{ backgroundColor: '#F7F4EE' }}>
+                  <div className="flex flex-col items-center text-center">
+                    <span className="text-lg mb-1">🔥</span>
+                    <span className="text-xs text-gray-600">Streak</span>
+                    <p className="text-lg font-bold" style={{ color: '#333333' }}>{userProgress.streak}</p>
                   </div>
                 </Card>
               </div>
 
-              {/* Achievements Preview */}
+              {/* Achievements Preview - Thu gọn */}
               <Card className="p-4 rounded-xl border-0" style={{ backgroundColor: 'white', border: '2px dashed #FFD966' }}>
-                <h3 className="mb-3" style={{ color: '#333333' }}>Next Rewards</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Award className="w-6 h-6" style={{ color: '#FFD966' }} />
-                    <div className="flex-1">
-                      <p className="text-sm" style={{ color: '#333333' }}>Focus Master</p>
-                      <p className="text-xs" style={{ color: '#666666' }}>Complete 10 sessions</p>
+                <h3 className="mb-2 text-sm font-medium" style={{ color: '#333333' }}>Next Rewards</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-5 h-5" style={{ color: '#FFD966' }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate" style={{ color: '#333333' }}>Focus Master</p>
+                      <p className="text-[10px] text-gray-500 truncate">Complete 10 sessions</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Award className="w-6 h-6" style={{ color: '#DFF7E8' }} />
-                    <div className="flex-1">
-                      <p className="text-sm" style={{ color: '#333333' }}>Time Champion</p>
-                      <p className="text-xs" style={{ color: '#666666' }}>Reach Level 5</p>
+                  <div className="flex items-center gap-2">
+                    <Award className="w-5 h-5" style={{ color: '#DFF7E8' }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate" style={{ color: '#333333' }}>Time Champion</p>
+                      <p className="text-[10px] text-gray-500 truncate">Reach Level 5</p>
                     </div>
                   </div>
                 </div>
@@ -310,7 +306,7 @@ export function MainChildInterface() {
         </AnimatePresence>
 
         {/* Main Interaction Space */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 h-full overflow-y-auto min-h-0">
           <div className="max-w-4xl mx-auto p-6 pb-24">
             {/* Focus Mode Toggle */}
             <motion.div

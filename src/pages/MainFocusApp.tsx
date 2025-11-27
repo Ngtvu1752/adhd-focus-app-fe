@@ -57,60 +57,60 @@ export default function MainFocusApp() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen overflow-hidden">
       <Toaster position="top-center" />
       
       {/* 5. ĐÂY LÀ THANH NAVBAR MỚI CỦA BẠN */}
-      <header className="sticky top-0 z-50 w-full border-b bg-white">
+      <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex h-14 items-center justify-between">
             
             {/* Vế trái: Tiêu đề và Vai trò */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <motion.div
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className="w-7 h-7 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: '#FFD966' }}
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                 >
-                  <span className="text-xl">🎯</span>
+                  <span className="text-lg">🎯</span>
                 </motion.div>
-                <h2 className="font-semibold text-lg" style={{ color: '#333333' }}>FocusBuddy</h2>
+                <h2 className="font-semibold text-base" style={{ color: '#333333' }}>FocusBuddy</h2>
               </div>
               
               {/* Hiển thị vai trò (Parent/Child) */}
               <Badge 
                 variant="outline"
-                className={
+                className={`text-xs px-2 py-0.5 ${
                   user?.role === 'parent' 
-                  ? "bg-green-100 text-green-800 border-green-200" 
-                  : "bg-blue-100 text-blue-800 border-blue-200"
-                }
+                  ? "bg-green-50 text-green-700 border-green-200" 
+                  : "bg-blue-50 text-blue-700 border-blue-200"
+                }`}
               >
-                {user?.role === 'parent' ? 'Parent Mode' : 'Child Mode'}
+                {user?.role === 'parent' ? 'Parent' : 'Child'}
               </Badge>
             </div>
 
             {/* Vế phải: Avatar và Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-    <button type="button" className="h-9 w-9 rounded-full">
-      <Avatar className="cursor-pointer h-9 w-9">
-        <AvatarFallback 
-          className={
-            user?.role === 'parent' 
-              ? "bg-green-100 text-green-800" 
-              : "bg-blue-100 text-blue-800"
-          }
-        >
-          {getInitials(user?.name || user?.email)}
-        </AvatarFallback>
-      </Avatar>
-    </button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent className="w-56 z-[100]" align="end">
-  
+                <button type="button" className="h-8 w-8 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2">
+                  <Avatar className="cursor-pointer h-8 w-8">
+                    <AvatarFallback 
+                      className={`text-xs ${
+                        user?.role === 'parent' 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {getInitials(user?.name || user?.email)}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 z-[100]" align="end">
+              
                 <DropdownMenuLabel>
                   <p className="text-sm font-medium">Tài khoản</p>
                   <p className="text-xs text-muted-foreground font-normal">
@@ -126,18 +126,18 @@ export default function MainFocusApp() {
                     onClick={() => setCurrentPage('settings')}
                   >
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>Task Settings</span>
+                    <span>Settings</span>
                   </DropdownMenuItem>
                 )}
                 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-      className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600"
-      onClick={handleLogout}
-    >
-      <LogOut className="mr-2 h-4 w-4" />
-      <span>Đăng xuất</span>
-    </DropdownMenuItem>
+                  className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Đăng xuất</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -146,7 +146,7 @@ export default function MainFocusApp() {
       </header>
 
       {/* 6. PHẦN NỘI DUNG CHÍNH (flex-1 để lấp đầy không gian) */}
-      <main className="flex-1">
+      <main className="flex-1 overflow-hidden bg-[#F7F4EE]">
         <AnimatePresence mode="wait">
           <motion.div
             key={user?.role === 'parent' ? currentPage : 'child'}
@@ -154,39 +154,72 @@ export default function MainFocusApp() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="h-full" // Đảm bảo motion div chiếm chiều cao
+            className="h-full"
           >
             {renderPage()}
           </motion.div>
         </AnimatePresence>
       </main>
-
+      
       {/* 7. Thanh điều hướng dưới cùng (chỉ cho Parent) */}
       {user?.role === 'parent' && (
-        <div className="sticky bottom-0 left-0 right-0 border-t" style={{ backgroundColor: 'white' }}>
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex justify-around py-4">
-              <Button
-                variant="ghost"
+        <nav className="sticky bottom-0 left-0 right-0 border-t bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)] shrink-0">
+          <div className="grid grid-cols-2 gap-0">
+              
+              {/* Nút Dashboard */}
+              <button
+                type="button"
                 onClick={() => setCurrentPage('parent-dashboard')}
-                className="flex-col h-auto py-2 gap-1"
-                style={currentPage === 'parent-dashboard' ? { color: '#FFD966' } : { color: '#666666' }}
+                className={`
+                  flex flex-col items-center justify-center h-16 gap-1.5
+                  transition-all duration-200 ease-in-out
+                  border-t-2 
+                  ${currentPage === 'parent-dashboard' 
+                    ? 'bg-amber-50 border-t-amber-400 text-amber-800' 
+                    : 'bg-white border-t-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                  }
+                `}
               >
-                <BarChart3 className="w-6 h-6" />
-                <span className="text-xs">Dashboard</span>
-              </Button>
-              <Button
-                variant="ghost"
+                <BarChart3 
+                  className={`w-5 h-5 transition-colors ${
+                    currentPage === 'parent-dashboard' ? 'text-amber-500' : 'text-gray-400'
+                  }`} 
+                />
+                <span className={`text-xs font-medium ${
+                  currentPage === 'parent-dashboard' ? 'font-semibold' : 'font-normal'
+                }`}>
+                  Dashboard
+                </span>
+              </button>
+
+              {/* Nút Tasks */}
+              <button
+                type="button"
                 onClick={() => setCurrentPage('settings')}
-                className="flex-col h-auto py-2 gap-1"
-                style={currentPage === 'settings' ? { color: '#FFD966' } : { color: '#666666' }}
+                className={`
+                  flex flex-col items-center justify-center h-16 gap-1.5
+                  transition-all duration-200 ease-in-out
+                  border-t-2
+                  ${currentPage === 'settings' 
+                    ? 'bg-amber-50 border-t-amber-400 text-amber-800' 
+                    : 'bg-white border-t-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                  }
+                `}
               >
-                <Settings className="w-6 h-6" />
-                <span className="text-xs">Tasks</span>
-              </Button>
+                <Settings 
+                  className={`w-5 h-5 transition-colors ${
+                    currentPage === 'settings' ? 'text-amber-500' : 'text-gray-400'
+                  }`} 
+                />
+                <span className={`text-xs font-medium ${
+                  currentPage === 'settings' ? 'font-semibold' : 'font-normal'
+                }`}>
+                  Tasks
+                </span>
+              </button>
+              
             </div>
-          </div>
-        </div>
+        </nav>
       )}
 
       {/* 8. XÓA BỎ: Khoảng đệm h-24 không còn cần thiết vì navbar dưới cùng là 'sticky' */}
