@@ -18,7 +18,6 @@ const LoginPage = () => {
     <div className="font-['Roboto','Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] min-h-screen flex justify-center items-center bg-bg-primary overflow-hidden">
       {/* Animated background circles - Cập nhật màu sắc */}
       <div className="absolute rounded-full bg-[#809BCE]/30 w-[300px] h-[300px] -top-[150px] -left-[150px] animate-float"></div>
-      <div className="absolute rounded-full bg-[#809BCE]/30 w-[200px] h-[200px] -bottom-[100px] -right-[100px] animate-float [animation-delay:4s]"></div>
       <div className="absolute rounded-full bg-[#809BCE]/30 w-[150px] h-[150px] top-1/2 right-[10%] animate-float [animation-delay:2s]"></div>
 
       {/* Main container */}

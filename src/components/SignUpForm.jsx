@@ -121,7 +121,7 @@ const SignUpForm = ({ isParent, setIsParent }) => {
             Nhập lại mật khẩu
           </label>
         </div>
-        <div className="w-full mb-6">
+        {/*<div className="w-full mb-6">
           <label htmlFor="isParentCheckSignUp" className="flex items-center gap-2 cursor-pointer text-text-primary/80">
             <input 
               type="checkbox"
@@ -133,7 +133,7 @@ const SignUpForm = ({ isParent, setIsParent }) => {
             Tôi là phụ huynh
           </label>
         </div>
-        
+        */}
         {/* Cập nhật nút "Đăng Ký" */}
                 
         <button 
