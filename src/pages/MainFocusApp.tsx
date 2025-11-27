@@ -146,7 +146,7 @@ export default function MainFocusApp() {
       </header>
 
       {/* 6. PHẦN NỘI DUNG CHÍNH (flex-1 để lấp đầy không gian) */}
-      <main className="flex-1 overflow-hidden bg-[#F7F4EE]">
+      <main className="flex-1 overflow-y-auto bg-[#F7F4EE]">
         <AnimatePresence mode="wait">
           <motion.div
             key={user?.role === 'parent' ? currentPage : 'child'}
