@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const SignInForm = ({ isParent, setIsParent }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,7 +16,7 @@ const SignInForm = ({ isParent, setIsParent }) => {
     setLoading(true);
 
     try {
-      await login(email, password, isParent);
+      await login(username, password, isParent);
       navigate('/app');
     } catch (err) {
       setError('Login failed. Please try again.');
@@ -56,15 +56,15 @@ const SignInForm = ({ isParent, setIsParent }) => {
       {/* Cập nhật input fields */}
       <div className="relative w-full my-4">
         <input 
-          type="email" 
+          type="text" 
           placeholder=" " 
           required 
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           className="w-full py-4 px-5 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 bg-neutral-light focus:outline-none focus:border-accent focus:bg-white focus:-translate-y-0.5 focus:shadow-[0_5px_15px_rgba(255,217,102,0.2)] peer"
         />
         <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
-          Email
+          Username
         </label>
       </div>
       

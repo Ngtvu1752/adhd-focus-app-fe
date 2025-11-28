@@ -1,13 +1,14 @@
 import axiosClient from "./axiosClient";
 interface LoginPayload {
-    email: string;
+    username: string;
     password: string;
+    role: 'SUPERVISOR' | 'CHILD';
 }
 interface SignupPayload {
     name: string;
     email: string;
     password: string;
-    role: 'supervisor' | 'user';
+    role: 'SUPERVISOR' | 'CHILD';
 }
 
 const authApi = {
@@ -15,7 +16,7 @@ const authApi = {
         return axiosClient.post('/auth/login', payload);
     },
     signup: (payload: SignupPayload) => {
-        return axiosClient.post('/auth/signup', payload);
+        return axiosClient.post('/auth/register', payload);
     },
     getProfile: () => {
         return axiosClient.get('/auth/profile');

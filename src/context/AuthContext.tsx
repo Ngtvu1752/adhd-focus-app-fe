@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import authApi from '../api/authApi';
 interface User {
-  email: string;
+  id?: string;
+  username: string; // Đổi từ email sang username
   name: string;
-  role: 'parent' | 'child'; // Vai trò bây giờ rõ ràng
-  loginTime: string;
+  role: 'SUPERVISOR' | 'CHILD';
 }
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string, isParent?: boolean) => Promise<User>;
-  signup: (name: string, email: string, password: string, isParent?: boolean) => Promise<User>;
+  login: (username: string, password: string, isParent?: boolean) => Promise<void>;
+  signup: (name: string, username: string, password: string, isParent?: boolean) => Promise<User>;
   logout: () => void;
 }
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -31,36 +32,58 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser) as User);
+    const token = localStorage.getItem('accessToken');
+    if (savedUser && token) {
+      setUser(JSON.parse(savedUser));
     }
     setLoading(false);
   }, []);
 
-  const login = (email: string, password: string, isParent: boolean = false): Promise<User> => {
-    // Mô phỏng API call
-    console.log("Logging in as", isParent ? "parent" : "child");
-    
-    const userData: User = {
-      email,
-      name: email.split('@')[0],
-      role: isParent ? 'parent' : 'child', // Đặt vai trò ở đây
-      loginTime: new Date().toISOString()
-    };
-    
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    return Promise.resolve(userData);
+  const login = async (username: string, password: string, isParent: boolean = false) => {
+    try {
+      // 1. Xác định role gửi lên Server
+      // Ví dụ: Parent -> "SUPERVISOR", Child -> "CHILD" (hoặc tên role bên backend quy định cho con)
+      const apiRole = isParent ? "SUPERVISOR" : "CHILD";
+
+      // 2. Gọi API
+      const response: any = await authApi.login({ 
+        username, 
+        password, 
+        role: apiRole 
+      });
+      
+      // Response mẫu: { message: "...", token: "..." }
+      const { token } = response;
+
+      if (!token) throw new Error("Không nhận được token từ server");
+
+      // 3. Lưu Token
+      localStorage.setItem('accessToken', token);
+
+      // 4. Tạo đối tượng User để lưu vào App (Vì API không trả về info user)
+      // Chúng ta lấy luôn username người dùng nhập để làm tên hiển thị
+      const userData: User = {
+        username: username,
+        name: username, // Có thể đổi thành tên thật nếu có API lấy info
+        role: isParent ? 'SUPERVISOR' : 'CHILD' // Map lại về role của App Frontend
+      };
+
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      
+    } catch (error) {
+      console.error("Login Error:", error);
+      throw error;
+    }
   };
 
-  const signup = (name: string, email: string, password: string, isParent: boolean = false): Promise<User> => {
+  const signup = (name: string, username: string, password: string, isParent: boolean = true): Promise<User> => {
     // Mô phỏng API call
-    // Mặc định đăng ký là 'child', bạn có thể thêm logic sau
+    // Mặc định đăng ký là 'SUPERVISOR', bạn có thể thêm logic sau
     const userData: User = {
-      email,
+      username,
       name,
-      role: isParent ? 'parent' : 'child', 
-      loginTime: new Date().toISOString()
+      role: isParent ? 'SUPERVISOR' : 'CHILD', 
     };
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -70,6 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
   };
 
   const value = {
