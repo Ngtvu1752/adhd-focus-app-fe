@@ -104,7 +104,7 @@ export default function MainFocusApp() {
                           : "bg-blue-100 text-blue-800"
                       }`}
                     >
-                      {getInitials(user?.name || user?.email)}
+                      {getInitials(user?.name || user?.username)}
                     </AvatarFallback>
                   </Avatar>
                 </button>
@@ -114,7 +114,7 @@ export default function MainFocusApp() {
                 <DropdownMenuLabel>
                   <p className="text-sm font-medium">Tài khoản</p>
                   <p className="text-xs text-muted-foreground font-normal">
-                    {user?.email}
+                    {user?.name || user?.username}
                   </p>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

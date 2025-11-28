@@ -4,7 +4,7 @@ interface User {
   id?: string;
   username: string; // Đổi từ email sang username
   name: string;
-  role: 'SUPERVISOR' | 'CHILD';
+  role: 'parent' | 'child';
 }
 interface AuthContextType {
   user: User | null;
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoading(false);
   }, []);
 
-  const login = async (username: string, password: string, isParent: boolean = false) => {
+  const login = async (username: string, password: string, isParent: boolean = true) => {
     try {
       // 1. Xác định role gửi lên Server
       // Ví dụ: Parent -> "SUPERVISOR", Child -> "CHILD" (hoặc tên role bên backend quy định cho con)
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const userData: User = {
         username: username,
         name: username, // Có thể đổi thành tên thật nếu có API lấy info
-        role: isParent ? 'SUPERVISOR' : 'CHILD' // Map lại về role của App Frontend
+        role: isParent ? 'parent' : 'child' // Map lại về role của App Frontend
       };
 
       localStorage.setItem('user', JSON.stringify(userData));
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const userData: User = {
       username,
       name,
-      role: isParent ? 'SUPERVISOR' : 'CHILD', 
+      role: isParent ? 'parent' : 'child', 
     };
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
