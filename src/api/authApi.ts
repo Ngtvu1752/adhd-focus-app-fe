@@ -5,8 +5,9 @@ interface LoginPayload {
     role: 'SUPERVISOR' | 'CHILD';
 }
 interface SignupPayload {
-    name: string;
-    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
     password: string;
     role: 'SUPERVISOR' | 'CHILD';
 }

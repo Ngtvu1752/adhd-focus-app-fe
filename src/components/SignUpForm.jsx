@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const SignUpForm = ({ isParent, setIsParent }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,10 +30,13 @@ const SignUpForm = ({ isParent, setIsParent }) => {
     setLoading(true);
 
     try {
-      await signup(name, email, password, isParent);
+      await signup(username, firstName, lastName, password, isParent);
       navigate('/app');
     } catch (err) {
-      setError('Đăng ký thất bại. Vui lòng thử lại.');
+      console.log(err);
+      // Hiển thị lỗi từ backend nếu có
+      const msg = err.response?.data?.message || 'Đăng ký thất bại. Tên đăng nhập có thể đã tồn tại.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -68,29 +72,37 @@ const SignUpForm = ({ isParent, setIsParent }) => {
         <span className="text-[13px] text-text-primary/60 mb-6">hoặc sử dụng email</span>
         
         {/* Cập nhật input fields */}
-        <div className="relative w-full mb-4">
-          <input 
-            type="text" 
-            placeholder=" " 
-            required 
-            className="w-full py-4 px-5 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 bg-neutral-light focus:outline-none focus:border-accent focus:bg-white focus:-translate-y-0.5 focus:shadow-[0_5px_15px_rgba(255,217,102,0.2)] peer"
-          />
-          <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
-            Họ và Tên
-          </label>
+        <div className="flex gap-3 w-full mb-3">
+          <div className="relative w-1/2">
+            <input 
+              type="text" placeholder=" " required 
+              value={lastName} onChange={(e) => setLastName(e.target.value)}
+              className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-sm bg-neutral-light focus:outline-none focus:border-accent focus:bg-white peer"
+            />
+            <label className="absolute left-4 top-3 text-text-primary/60 text-sm pointer-events-none bg-transparent peer-focus:-top-2.5 peer-focus:bg-white peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:text-xs">
+              Last Name
+            </label>
+          </div>
+          <div className="relative w-1/2">
+            <input 
+              type="text" placeholder=" " required 
+              value={firstName} onChange={(e) => setFirstName(e.target.value)}
+              className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-sm bg-neutral-light focus:outline-none focus:border-accent focus:bg-white peer"
+            />
+            <label className="absolute left-4 top-3 text-text-primary/60 text-sm pointer-events-none bg-transparent peer-focus:-top-2.5 peer-focus:bg-white peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:text-xs">
+              First Name
+            </label>
+          </div>
         </div>
         
-        <div className="relative w-full mb-4">
+        <div className="relative w-full mb-3">
           <input 
-            type="email" 
-            placeholder=" " 
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full py-4 px-5 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 bg-neutral-light focus:outline-none focus:border-overlay-start focus:bg-white focus:-translate-y-0.5 focus:shadow-[0_5px_15px_rgba(74,144,226,0.2)] peer"
+            type="text" placeholder=" " required
+            value={username} onChange={(e) => setUsername(e.target.value)}
+            className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-sm bg-neutral-light focus:outline-none focus:border-accent focus:bg-white peer"
           />
-          <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
-            Email
+          <label className="absolute left-4 top-3 text-text-primary/60 text-sm pointer-events-none bg-transparent peer-focus:-top-2.5 peer-focus:bg-white peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:text-xs">
+            Username
           </label>
         </div>
         

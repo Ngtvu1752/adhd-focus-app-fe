@@ -10,7 +10,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (username: string, password: string, isParent?: boolean) => Promise<void>;
-  signup: (name: string, username: string, password: string, isParent?: boolean) => Promise<User>;
+  signup: (username: string, firstName: string, lastName: string, password: string, isParent?: boolean) => Promise<void>;
   logout: () => void;
 }
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -77,17 +77,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const signup = (name: string, username: string, password: string, isParent: boolean = true): Promise<User> => {
-    // Mô phỏng API call
-    // Mặc định đăng ký là 'SUPERVISOR', bạn có thể thêm logic sau
-    const userData: User = {
-      username,
-      name,
-      role: isParent ? 'parent' : 'child', 
-    };
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    return Promise.resolve(userData);
+  const signup = async(username: string, firstName: string, lastName: string, password: string, isParent: boolean = true): Promise<void> => {
+    try {
+      const apiRole = isParent ? "SUPERVISOR" : "CHILD";
+      console.log("Signing up with:", { username, firstName, lastName, password, role: apiRole });
+      await authApi.signup({ 
+        username, 
+        firstName,
+        lastName,
+        password, 
+        role: apiRole 
+      });
+      // Trả về đối tượng User sau khi đăng ký thành công
+      await login(username, password, isParent);
+    } catch (error) {
+      console.error("Signup Error:", error);
+      throw error;  
+    }
   };
 
   const logout = () => {
