@@ -243,14 +243,32 @@ export function MainChildInterface() {
     <div className="h-full" style={{ background: 'linear-gradient(135deg, #E8F5FF 0%, #DFF7E8 100%)' }}>
       <div className="flex h-full">
         {/* Gamification Sidebar - Hidden in Focus Mode */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {!focusMode && (
             <motion.div
-              className="w-80 border-r p-4 h-full overflow-hidden flex flex-col shrink-0"
+              layout
+              className="border-r p-4 h-full overflow-hidden flex flex-col shrink-0"
               style={{ backgroundColor: 'white' }}
-              initial={{ x: -320 }}
-              animate={{ x: 0 }}
-              exit={{ x: -320 }}
+              initial={{ width: 0, opacity: 0, x: -50 }}
+              animate={{ 
+                width: 320, 
+                opacity: 1, 
+                x: 0,
+                transition: { 
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30
+                }
+              }}
+              exit={{ 
+                width: 0, 
+                opacity: 0, 
+                x: -50,
+                transition: { 
+                  duration: 1, // Thoát nhanh hơn một chút để tránh lag
+                  ease: "easeInOut"
+                }
+              }}
               transition={{ type: 'spring', damping: 25 }}
             >
               {/* User Level Card */}
