@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         password, 
         role: apiRole 
       });
-      
+      console.log("Login Response:", response);
       // Response mẫu: { message: "...", token: "..." }
       const { token } = response;
 
@@ -65,7 +65,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const userData: User = {
         username: username,
         name: username, // Có thể đổi thành tên thật nếu có API lấy info
-        role: isParent ? 'parent' : 'child' // Map lại về role của App Frontend
+        role: isParent ? 'parent' : 'child', // Map lại về role của App Frontend
+        id: response.user.id // Giả sử backend trả về userId khi login
       };
 
       localStorage.setItem('user', JSON.stringify(userData));

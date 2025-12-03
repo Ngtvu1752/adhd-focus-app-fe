@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { ChildManagement } from './ChildManagement';
 import {
   BarChart3,
   Calendar,
@@ -318,6 +319,14 @@ export function ParentDashboard() {
               </div>
             </div>
           </Card>
+        </motion.div>
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <ChildManagement />
         </motion.div>
       </div>
     </div>

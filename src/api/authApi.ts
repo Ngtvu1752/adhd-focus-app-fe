@@ -11,7 +11,12 @@ interface SignupPayload {
     password: string;
     role: 'SUPERVISOR' | 'CHILD';
 }
-
+interface CreateChildPayload {
+  username: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+}
 const authApi = {
     login: (payload: LoginPayload) => {
         return axiosClient.post('/auth/login', payload);
@@ -21,6 +26,12 @@ const authApi = {
     },
     getProfile: () => {
         return axiosClient.get('/auth/profile');
+    },
+    getChildren: () => {
+        return axiosClient.get('/supervisors/my-children');
+    },
+    createChild: (payload: CreateChildPayload) => {
+        return axiosClient.post('/supervisors/my-children', payload);
     }
 };
 
