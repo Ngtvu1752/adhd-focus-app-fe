@@ -137,7 +137,7 @@ export function ParentDashboard() {
               icon: Award,
               value: stats.totalSessions,
               bg: "#E8F5FF",
-              suffix: "",
+              suffix: "sessions",
             },
             {
               label: "Total Time",

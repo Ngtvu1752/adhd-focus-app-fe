@@ -59,8 +59,8 @@ const taskApi = {
   // Cập nhật trạng thái nhiệm vụ (Backend tự log time)
   updateStatus: (taskId: string, status: TaskStatus) => {
     return axiosClient.patch('/tasks/status', {
-      taskId,
-      status
+      id: taskId, 
+      status: status
     }) as Promise<Task>;
   },
 
