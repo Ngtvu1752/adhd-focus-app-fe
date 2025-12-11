@@ -14,9 +14,11 @@ import { FocusMascot } from './FocusMascot';
 import { toast } from 'sonner';
 
 import taskApi, { Task, TaskStatus } from '../api/taskApi';
+import pomodoroApi from '../api/pomodoroApi';
 import { useAuth } from '../context/AuthContext';
+import authApi from '../api/authApi';
 import { themes } from './util/colorTheme';
-// --- 1. ĐỊNH NGHĨA THEME & MODE ---
+
 type TimerMode = 'focus' | 'short' | 'long';
 
 interface UserProgress {
@@ -35,11 +37,10 @@ export function MainChildInterface() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   
-  // 2. Thay thế isBreak bằng mode
   const [mode, setMode] = useState<TimerMode>('focus');
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
-  const [pomodoroCount, setPomodoroCount] = useState(0); // Đếm số phiên để tính nghỉ dài
+  const [pomodoroCount, setPomodoroCount] = useState(0); 
 
   const [showCelebration, setShowCelebration] = useState(false);
   const [showTaskComplete, setShowTaskComplete] = useState(false);
@@ -47,15 +48,44 @@ export function MainChildInterface() {
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const theme = themes[mode];
+  const MAX_POMODORO = 4; 
+
+  const calculateLevelInfo = (totalPoints: number) => {
+    const level = Math.floor(totalPoints / 100) + 1;
+    const currentLevelPoints = totalPoints % 100;
+    const pointsToNextLevel = 100 - currentLevelPoints;
+    return { level, currentLevelPoints, pointsToNextLevel };
+  };
   const [userProgress, setUserProgress] = useState<UserProgress>({
-    totalPoints: 0, level: 1, currentLevelPoints: 0, pointsToNextLevel: 100, totalSessions: 0, streak: 0
+    totalPoints: 0, level: 1, currentLevelPoints: 0, pointsToNextLevel: 100, totalSessions: 0, streak: 10
   });
 
-  // Lấy theme hiện tại
-  const theme = themes[mode];
-  const MAX_POMODORO = 4; // Sau 4 phiên thì nghỉ dài
-
-  // Tính toán Progress Circle theo tổng thời gian của mode
+  useEffect(() => {
+    if (user) {
+      // Nếu có user (từ API login), tính toán lại progress dựa trên user.totalPoints
+      const points = user.totalPoints || 0;
+      const levelInfo = calculateLevelInfo(points);
+      
+      setUserProgress(prev => ({
+        ...prev,
+        totalPoints: points,
+        streak: user.currentStreak || 0,
+        level: user.userLevel || levelInfo.level, // Ưu tiên level từ DB, nếu k có thì tự tính
+        currentLevelPoints: levelInfo.currentLevelPoints,
+        pointsToNextLevel: levelInfo.pointsToNextLevel,
+        // totalSessions có thể cần API riêng, tạm thời giữ nguyên hoặc lấy từ localStorage nếu muốn
+      }));
+    } else {
+      // Fallback: Nếu không có user (chưa login/mất mạng), thử lấy từ localStorage
+      //const savedProgress = localStorage?.getItem('userProgress');
+      //if (savedProgress) {
+        //setUserProgress(JSON.parse(savedProgress));
+      //}
+      console.log("No user data available to load progress.");
+    }
+  }, [user]);
   const getDuration = () => {
     switch (mode) {
       case 'short': return 5 * 60;
@@ -66,10 +96,9 @@ export function MainChildInterface() {
   const sessionDuration = getDuration();
   const progressValue = ((sessionDuration - timeLeft) / sessionDuration) * 100;
 
-  // --- Effects ---
   useEffect(() => {
     if (user?.id) loadTasks();
-    loadProgress();
+    //loadProgress();
   }, [user?.id]);
 
   useEffect(() => {
@@ -82,7 +111,6 @@ export function MainChildInterface() {
     return () => { if (interval) clearInterval(interval); };
   }, [isActive, timeLeft]);
 
-  // Phím tắt tắt modal
   useEffect(() => {
     const handleKeyDown = () => {
       if (showCelebration) setShowCelebration(false);
@@ -98,7 +126,6 @@ export function MainChildInterface() {
     };
   }, [showCelebration, showTaskComplete]);
 
-  // --- Logic Functions ---
 
   const loadTasks = async () => {
     try {
@@ -118,8 +145,26 @@ export function MainChildInterface() {
     const savedProgress = localStorage.getItem('userProgress');
     if (savedProgress) setUserProgress(JSON.parse(savedProgress));
   };
-
-  // 3. Hàm chuyển đổi Mode
+  const addPoints = (points: number) => {
+    // 1. Tính toán điểm mới dựa trên state hiện tại
+    const newTotal = userProgress.totalPoints + points;
+    const levelInfo = calculateLevel(newTotal);
+    
+    const newProgress = { 
+      ...userProgress, 
+      totalPoints: newTotal, 
+      ...levelInfo, 
+      totalSessions: userProgress.totalSessions + 1 
+    };
+    
+    // 2. Cập nhật UI ngay lập tức
+    setUserProgress(newProgress);
+    
+    // 3. Lưu tạm vào localStorage (để nếu F5 thì vẫn thấy điểm mới)
+    //localStorage.setItem('userProgress', JSON.stringify(newProgress));
+    
+    // KHÔNG GỌI API update points ở đây nữa vì Backend đã tự làm khi update Task
+  };
   const switchMode = (newMode: TimerMode) => {
     setMode(newMode);
     setIsActive(false);
@@ -135,7 +180,6 @@ export function MainChildInterface() {
     }
     setCurrentTask(task);
     
-    // Khi chọn task -> Tự động chuyển về chế độ Focus
     switchMode('focus');
     
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -146,8 +190,27 @@ export function MainChildInterface() {
       setIsActive(false);
       return;
     }
+
+    const isNewSession = timeLeft === sessionDuration;
     
-    // Chỉ cập nhật status khi ở chế độ Focus
+    if (mode === 'focus' && isNewSession && user?.id) {
+      try {
+        const newSession = await pomodoroApi.createPomodoroSession({
+          childId: user.id,
+          startTime: new Date().toISOString(),
+          focusMinutes: 25,
+          breakMinutes: 0,
+        });
+        
+        if (newSession && newSession.id) {
+          setCurrentSessionId(newSession.id);
+          console.log("Started Pomodoro Session:", newSession.id);
+        }
+      } catch (error) {
+        console.error("Failed to create pomodoro session", error);
+      }
+    }
+    
     if (mode === 'focus' && currentTask) {
       if (currentTask.status === TaskStatus.TODO) {
         try {
@@ -169,6 +232,15 @@ export function MainChildInterface() {
       playSuccessSound();
       setShowTaskComplete(true);
       setIsActive(false);
+      if (currentSessionId) {
+        const minutesDone = Math.ceil((sessionDuration - timeLeft) / 60);
+        
+        await pomodoroApi.updatePomodoroSession(currentSessionId, {
+          endTime: new Date().toISOString(),
+          focusMinutes: minutesDone > 0 ? minutesDone : 1, 
+        });
+        setCurrentSessionId(null);
+      }
       await taskApi.updateStatus(currentTask.id, TaskStatus.COMPLETED);
       addPoints(100);
       
@@ -218,19 +290,30 @@ export function MainChildInterface() {
     }
   };
 
-  // 4. Logic hoàn thành timer tự động chuyển mode
-  const handleTimerComplete = () => {
+  const handleTimerComplete = async () => {
     setIsActive(false);
     playSound();
     
     if (mode === 'focus') {
       // Hoàn thành phiên tập trung
+      if (currentSessionId) {
+        try {
+          await pomodoroApi.updatePomodoroSession(currentSessionId, {
+            endTime: new Date().toISOString(),
+            focusMinutes: 25, // Đã hoàn thành trọn vẹn
+            // Có thể update thêm breakMinutes nếu muốn tính gộp
+          });
+          console.log("Session updated successfully");
+          setCurrentSessionId(null); // Reset ID để lần sau tạo mới
+        } catch (error) {
+          console.error("Failed to update session", error);
+        }
+      }
       const newCount = pomodoroCount + 1;
       setPomodoroCount(newCount);
       addPoints(50); 
       setShowCelebration(true);
 
-      // Tự động chuyển mode nghỉ
       if (newCount % MAX_POMODORO === 0) {
         switchMode('long');
         toast.success("Tuyệt vời! Nghỉ dài hơi nào! 🛋️");
@@ -239,17 +322,14 @@ export function MainChildInterface() {
         toast.info("Nghỉ ngắn một chút nhé! ☕");
       }
     } else {
-      // Hết giờ nghỉ -> Quay lại làm việc
       switchMode('focus');
       toast.info("Hết giờ nghỉ, quay lại tập trung nào! 💪");
     }
   };
   const handleSkip = () => {
-    setIsActive(false); // Dừng đồng hồ ngay lập tức
+    setIsActive(false); 
 
     if (mode === 'focus') {
-      // Nếu đang Focus -> Chuyển sang Break
-      // Tăng số đếm phiên lên để tính toán nghỉ dài/ngắn cho đúng quy trình
       const newCount = pomodoroCount + 1;
       setPomodoroCount(newCount);
 
@@ -261,7 +341,6 @@ export function MainChildInterface() {
         toast.info("Đã chuyển nhanh sang: Nghỉ ngắn ☕");
       }
     } else {
-      // Nếu đang Break -> Chuyển sang Focus
       switchMode('focus');
       toast.info("Đã chuyển nhanh sang: Tập trung 📚");
     }
@@ -269,10 +348,13 @@ export function MainChildInterface() {
 
   const resetTimer = () => {
     setIsActive(false);
-    switchMode(mode); // Reset về thời gian gốc của mode hiện tại
+    switchMode(mode); 
   };
+  const refreshUserData = async () => {
+    const freshUser = await authApi.getProfile();
+    setUserProgress(prev => ({ ...prev, streak: freshUser.currentStreak }));
+}
 
-  // ... (Các hàm support: saveProgress, calculateLevel, addPoints, playSound, playSuccessSound, formatTime, formatDate) ...
   const saveProgress = (newProgress: UserProgress) => {
     localStorage.setItem('userProgress', JSON.stringify(newProgress));
     setUserProgress(newProgress);
@@ -282,12 +364,7 @@ export function MainChildInterface() {
     const currentLevelPoints = points % 100;
     return { level, currentLevelPoints, pointsToNextLevel: 100 - currentLevelPoints };
   };
-  const addPoints = (points: number) => {
-    const newTotal = userProgress.totalPoints + points;
-    const levelInfo = calculateLevel(newTotal);
-    const newProgress = { ...userProgress, totalPoints: newTotal, ...levelInfo, totalSessions: userProgress.totalSessions + 1 };
-    saveProgress(newProgress);
-  };
+
   const playSound = () => {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const osc = ctx.createOscillator(); const gain = ctx.createGain();
@@ -319,13 +396,12 @@ export function MainChildInterface() {
 
   const getMascotMood = () => {
     if (showCelebration || showTaskComplete) return 'celebrating';
-    if (mode !== 'focus') return 'resting'; // Mascot nghỉ ngơi
+    if (mode !== 'focus') return 'resting'; 
     if (isActive) return 'focused';
     return 'happy';
   };
 
   return (
-    // 5. Cập nhật Main Container với màu nền động
     <motion.div 
       className="h-full transition-colors duration-500 ease-in-out" 
       style={{ background: theme.bg }}

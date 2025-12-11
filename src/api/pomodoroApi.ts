@@ -3,6 +3,7 @@ interface PomodoroSession {
     id?: string;             
     childId: string;        
     startTime: string;      
+    endTime?: string;       // Cho phép null/undefined khi phiên đang chạy
     focusMinutes: number;   
     breakMinutes: number;   
     createdAt?: string;

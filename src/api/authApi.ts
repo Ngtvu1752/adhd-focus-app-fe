@@ -17,6 +17,16 @@ interface CreateChildPayload {
   lastName: string;
   password: string;
 }
+interface User {
+  id?: string;
+  username: string; // Đổi từ email sang username
+  name: string;
+  role: 'parent' | 'child';
+  totalPoints: number;
+  userLevel: number;
+  currentStreak: number;
+}
+
 const authApi = {
     login: (payload: LoginPayload) => {
         return axiosClient.post('/auth/login', payload);
@@ -25,7 +35,7 @@ const authApi = {
         return axiosClient.post('/auth/register', payload);
     },
     getProfile: () => {
-        return axiosClient.get('/auth/profile');
+        return axiosClient.get('/users/my') as Promise<User>; 
     },
     getChildren: () => {
         return axiosClient.get('/supervisors/my-children');

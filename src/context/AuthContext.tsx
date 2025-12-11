@@ -5,6 +5,9 @@ interface User {
   username: string; // Đổi từ email sang username
   name: string;
   role: 'parent' | 'child';
+  totalPoints: number;
+  userLevel: number;
+  currentStreak: number;
 }
 interface AuthContextType {
   user: User | null;
@@ -66,7 +69,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         username: username,
         name: username, // Có thể đổi thành tên thật nếu có API lấy info
         role: isParent ? 'parent' : 'child', // Map lại về role của App Frontend
-        id: response.user.id // Giả sử backend trả về userId khi login
+        id: response.user.id, // Giả sử backend trả về userId khi login
+        totalPoints: response.user?.totalPoints ?? 0,
+        userLevel: response.user?.userLevel ?? 0,
+        currentStreak: response.user?.currentStreak ?? 0
       };
 
       localStorage.setItem('user', JSON.stringify(userData));
