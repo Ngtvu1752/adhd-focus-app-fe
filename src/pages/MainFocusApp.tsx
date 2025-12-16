@@ -8,6 +8,7 @@ import { ParentDashboard } from '../components/ParentDashboard';
 import { TaskSettings } from '../components/TaskSettings';
 import { KidProfileSettings } from '../components/KidProfileSettings';
 import { Toaster } from '../components/ui/sonner';
+import { RewardsShop } from '../components/RewardsShop';
 
 import { useAuth } from '../context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
@@ -21,7 +22,7 @@ import {
 } from "../components/ui/dropdown-menu";
 import { Badge } from "../components/ui/badge";
 
-type Page = 'parent-dashboard' | 'settings' | 'child-home' | 'kid-profile' | 'mascot-showcase';
+type Page = 'parent-dashboard' | 'settings' | 'child-home' | 'kid-profile' | 'mascot-showcase' | 'rewards-shop';
 type UserMode = 'child' | 'parent';
 const getInitials = (name: string | undefined) => {
   if (!name) return "U"; // User
@@ -41,6 +42,14 @@ export default function MainFocusApp() {
     navigate('/login'); // Điều hướng về trang login
   };
 
+  const handleChildNavigate = (target: string) => {
+    if (target === 'rewards-shop') {
+      setCurrentPage('rewards-shop');
+    } else {
+      setCurrentPage('child-home');
+    }
+  };
+
   const renderPage = () => {
     if (user?.role === 'parent') {
       switch (currentPage) {
@@ -54,11 +63,12 @@ export default function MainFocusApp() {
     switch (currentPage) {
       case 'kid-profile': 
         return <KidProfileSettings />; // Trang Profile của bạn
-           // Trang bộ sưu tập
+      case 'rewards-shop':
+        return <RewardsShop />;
       case 'child-home':
-        return <MainChildInterface />; // Trang chính (Đồng hồ)
+        return <MainChildInterface onNavigate={handleChildNavigate}/>; // Trang chính (Đồng hồ)
       default: 
-        return <MainChildInterface />; // Trang chính (Đồng hồ)
+        return <MainChildInterface  onNavigate={handleChildNavigate}/>; // Trang chính (Đồng hồ)
     }
 
   };

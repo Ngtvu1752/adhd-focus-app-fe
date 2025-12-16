@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Play, Pause, RotateCcw, Star, Award, Sparkles, 
   Eye, EyeOff, Trophy, Zap, ChevronRight, 
-  BookOpen, Calendar, Clock, CheckCircle, PartyPopper, Coffee, SkipForward
+  BookOpen, Calendar, Clock, CheckCircle, PartyPopper, Coffee, SkipForward, Gift
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Button } from './ui/button';
@@ -19,6 +19,10 @@ import { useAuth } from '../context/AuthContext';
 import authApi from '../api/authApi';
 import { themes } from './util/colorTheme';
 
+import { FocusDetector } from './Mediapipe/FocusDetector';
+import { FocusBuddyReminder } from './FocusBuddyReminder';
+import {RewardsShop} from './RewardsShop';
+
 type TimerMode = 'focus' | 'short' | 'long';
 
 interface UserProgress {
@@ -29,8 +33,11 @@ interface UserProgress {
   totalSessions: number;
   streak: number;
 }
+interface MainChildInterfaceProps {
+  onNavigate?: (target: string) => void;
+}
 
-export function MainChildInterface() {
+export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
   const { user } = useAuth();
   
   // --- States ---
@@ -401,6 +408,23 @@ export function MainChildInterface() {
     return 'happy';
   };
 
+  const [focusState, setFocusState] = useState<'FOCUSED' | 'DISTRACTED' | 'ABSENT'>('FOCUSED');
+  const [distractionWarning, setDistractionWarning] = useState<string | null>(null);
+
+  // Hàm callback xử lý khi AI phát hiện thay đổi
+  const handleFocusChange = (status: 'FOCUSED' | 'DISTRACTED' | 'ABSENT', reason?: string) => {
+    setFocusState(status);
+    
+    if (status === 'DISTRACTED' || status === 'ABSENT') {
+      setDistractionWarning(reason || 'Mất tập trung');
+      // Có thể tạm dừng đồng hồ nếu mất tập trung quá lâu (ví dụ > 5 giây)
+    } else {
+      setDistractionWarning(null);
+    }
+  };
+
+  const isDistracted = focusState === 'DISTRACTED' || focusState === 'ABSENT';
+
   return (
     <motion.div 
       className="h-full transition-colors duration-500 ease-in-out" 
@@ -485,6 +509,36 @@ export function MainChildInterface() {
                   </div>
                 </Card>
               </div>
+
+              {/* Rewards Shop Button & Next Rewards */}
+              <motion.div
+                className="mb-6"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  onClick={() => onNavigate?.('rewards-shop')}
+                  className="w-full rounded-2xl h-auto py-4"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFD966 0%, #FFB84D 100%)',
+                    color: '#333333',
+                    border: '2px solid #FFD966'
+                  }}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'white' }}>
+                        <Gift className="w-6 h-6" style={{ color: '#FFD966' }} />
+                      </div>
+                      <div className="text-left">
+                        <p style={{ color: '#333333' }}>Rewards Shop</p>
+                        <p className="text-xs" style={{ color: '#666666' }}>Spend your points!</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5" style={{ color: '#333333' }} />
+                  </div>
+                </Button>
+              </motion.div>
 
               <Card className="p-4 rounded-xl border-0" style={{ backgroundColor: 'white', border: '2px dashed #FFD966' }}>
                 <h3 className="mb-2 text-sm font-medium" style={{ color: '#333333' }}>Next Rewards</h3>
@@ -703,6 +757,23 @@ export function MainChildInterface() {
             </AnimatePresence>
           </div>
         </motion.div>
+        <div 
+        className={`fixed inset-0 z-[9997] pointer-events-none transition-opacity duration-1000 ${
+          isDistracted ? 'opacity-100 animate-pulse-subtle' : 'opacity-0'
+        }`}
+        style={{
+          // Sử dụng box-shadow để tạo viền mềm (inset) thay vì border cứng ||| màu mạnh hơn rgba(255, 180, 40, 0.75)
+          boxShadow: isDistracted ? 'inset 0 0 60px 20px rgba(255, 200, 60, 0.6)' : 'none'
+        }}
+        />
+        <div className="fixed bottom-4 right-4 z-50 w-48">
+          <FocusDetector isFocusMode={focusMode} onFocusChange={handleFocusChange} />
+          {distractionWarning && (
+            <div className="absolute bottom-full mb-2 right-0 bg-red-500 text-white p-2 rounded-lg text-xs shadow-lg animate-bounce">
+              ⚠️ {distractionWarning}
+            </div>
+          )}
+      </div>
       </div>
 
       {/* Confetti & Modal giữ nguyên */}

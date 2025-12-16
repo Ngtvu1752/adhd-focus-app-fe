@@ -17,3 +17,20 @@
   --color-text-primary: #333333;
 }
 
+@layer utilities {
+  /* Định nghĩa keyframes cho hiệu ứng thở nhẹ */
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 0.6; /* Độ mờ thấp nhất */
+    }
+    50% {
+      opacity: 1; /* Độ mờ cao nhất */
+    }
+  }
+
+  /* Tạo class tiện ích để dùng trong component */
+  .animate-pulse-subtle {
+    /* Chạy hiệu ứng trong 4 giây, lặp vô hạn, kiểu mượt mà (ease-in-out) */
+    animation: pulse-subtle 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
