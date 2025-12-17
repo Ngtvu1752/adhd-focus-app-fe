@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
 interface FocusDetectorProps {
-  isFocusMode: boolean; // Prop mới: Chỉ chạy khi bật Focus Mode
+  isFocusMode: boolean; 
   onFocusChange: (status: 'FOCUSED' | 'DISTRACTED' | 'ABSENT', reason?: string) => void;
 }
 
@@ -22,7 +22,8 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
   const requestRef = useRef<number>(0);
   const lastVideoTimeRef = useRef<number>(-1);
   const isPausedRef = useRef<boolean>(false);
-  // --- STATE CHO QUÁ TRÌNH HIỆU CHỈNH ---
+  const lastValidHeadPoseRef = useRef<{ yaw: number, pitch: number }>({ yaw: 0, pitch: 0 });
+  const missingFaceFramesRef = useRef<number>(0);
   // Step: 0 (Chưa bắt đầu), 1 (Nhìn Tâm), 2 (Nhìn Góc Trái Trên), 3 (Nhìn Góc Phải Dưới), 4 (Hoàn tất)
   const [calibrationStep, setCalibrationStep] = useState<number>(0); 
   const [calibrationProgress, setCalibrationProgress] = useState(0);
@@ -43,7 +44,6 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
   const distractionStreakRef = useRef<number>(0);
   const logCounterRef = useRef<number>(0);
 
-  // --- 1. KHỞI TẠO AI (Chỉ chạy 1 lần khi mount) ---
   useEffect(() => {
     const initMediaPipe = async () => {
       const filesetResolver = await FilesetResolver.forVisionTasks(
@@ -57,7 +57,9 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
         outputFaceBlendshapes: true,
         runningMode: "VIDEO",
         numFaces: 1,
-        refineLandmarks: true
+        refineLandmarks: true,
+        minFaceDetectionConfidence: 0.2, 
+        minFacePresenceConfidence: 0.2
       } as any);
       setIsModelLoaded(true);
     };
@@ -66,24 +68,21 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
     return () => stopCamera(); // Cleanup khi unmount
   }, []);
 
-  // --- 2. BẬT/TẮT CAMERA DỰA TRÊN FOCUS MODE ---
   useEffect(() => {
     if (isFocusMode && isModelLoaded) {
-      // Khi vào Focus Mode: Bắt đầu camera và quy trình hiệu chỉnh
       startWebcam();
       updateStep(1); 
       setCalibrationProgress(0);
       progressRef.current = 0;
     } else {
-      // Khi thoát Focus Mode: Tắt camera
       stopCamera();
       setCalibrationStep(0);
     }
   }, [isFocusMode, isModelLoaded]);
 
   const updateStep = (step: number) => {
-    calibrationStepRef.current = step; // Logic đọc cái này
-    setCalibrationStepUI(step);        // UI đọc cái này
+    calibrationStepRef.current = step; 
+    setCalibrationStepUI(step);        
   };
 
   const startWebcam = async () => {
@@ -102,14 +101,25 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
   };
 
   const stopCamera = () => {
-    cancelAnimationFrame(requestRef.current);
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+      requestRef.current = 0;
+    }
+
     if (videoRef.current && videoRef.current.srcObject) {
-      (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      
+      tracks.forEach(track => {
+        track.stop(); // Lệnh này sẽ tắt đèn xanh trên camera vật lý
+        // console.log("📷 Camera Track Stopped:", track.label);
+      });
+
       videoRef.current.srcObject = null;
     }
+    
   };
 
-  // --- 3. VÒNG LẶP XỬ LÝ (LOOP) ---
   const predictWebcam = async () => {
     if (!faceLandmarkerRef.current || !videoRef.current) return;
 
@@ -118,20 +128,52 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       lastVideoTimeRef.current = videoRef.current.currentTime;
       const results = faceLandmarkerRef.current.detectForVideo(videoRef.current, startTimeMs);
 
-      // 🔥 LOGIC KIỂM TRA MẶT
+      const currentStep = calibrationStepRef.current;
+
       if (results.faceLandmarks && results.faceLandmarks.length > 0) {
+        missingFaceFramesRef.current = 0; // Reset bộ đếm
+
         const landmarks = results.faceLandmarks[0];
         
-        const currentStep = calibrationStepRef.current;
+        // Cập nhật tư thế cuối cùng
+        const currentPose = calculateHeadPose(landmarks);
+        lastValidHeadPoseRef.current = currentPose;
 
-        // Chỉ chạy Calibration khi không bị PAUSE
         if (currentStep > 0 && currentStep < 4 && !isPausedRef.current) {
           processCalibration(landmarks);
         } else if (currentStep === 4) {
           processAttention(landmarks);
         }
       } else {
-         if (calibrationStepRef.current === 4) onFocusChange('ABSENT', 'Không thấy khuôn mặt');
+         // MẤT DẤU KHUÔN MẶT
+        
+         // Tăng bộ đếm frame bị mất
+         missingFaceFramesRef.current++;
+
+         // LẤY DỮ LIỆU CUỐI CÙNG ĐỂ SUY LUẬN
+         const lastPitch = lastValidHeadPoseRef.current.pitch - calibrationConfig.current.baselinePitch;
+         const lastYaw = lastValidHeadPoseRef.current.yaw - calibrationConfig.current.baselineYaw;
+
+         // Điều kiện: Góc cúi cuối cùng > 15 độ (tương đối so với baseline)
+         const isLookingDown = lastPitch > 15; 
+         
+         // Nếu đang cúi viết bài, cho phép mất mặt tới 450 frames (khoảng 15 giây)
+         // Nếu chỉ quay đầu, chỉ cho phép 90 frames (3 giây)
+         const limitFrames = isLookingDown ? 450 : 90;
+
+         if (missingFaceFramesRef.current < limitFrames) {
+             
+             if (isLookingDown) {
+                 // Nếu đang cúi viết bài -> Coi là FOCUSED (Tập trung)
+                 onFocusChange('FOCUSED'); 
+                 
+                 // Giữ UI màu xanh (Fake detected) để bé không bị xao nhãng
+             } else {
+                 onFocusChange('DISTRACTED', 'Quay đầu quá nhiều');
+             }
+         } else {
+             onFocusChange('ABSENT', 'Không thấy khuôn mặt');
+         }
       }
     }
     
@@ -167,13 +209,10 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
   };
 
   const finishCalibrationStep = () => {
-    // 1. Tạm dừng thu thập ngay lập tức
     isPausedRef.current = true;
 
-    // 2. Tính toán dữ liệu
     const dataCount = tempCalibrationData.current.yaw.length;
     
-    // Safety check: Nếu không có dữ liệu (tránh NaN)
     if (dataCount === 0) {
         console.warn("Không thu thập được dữ liệu, thử lại bước này...");
         progressRef.current = 0;
@@ -188,7 +227,6 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
     const currentStep = calibrationStepRef.current;
     console.log(`✅ Step ${currentStep} Done. AvgYaw: ${avgYaw.toFixed(2)}, AvgPitch: ${avgPitch.toFixed(2)}`);
 
-    // 3. Lưu cấu hình
     if (currentStep === 1) {
       calibrationConfig.current.baselineYaw = avgYaw;
       calibrationConfig.current.baselinePitch = avgPitch;
@@ -197,10 +235,12 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       updateStep(2);
     } 
     else if (currentStep === 2) {
-      calibrationConfig.current.yawRange = Math.abs(avgYaw - calibrationConfig.current.baselineYaw) * 1.5;
-      calibrationConfig.current.pitchUpRange = Math.abs(avgPitch - calibrationConfig.current.baselinePitch) * 1.5;
+      // Tính biên độ
+      const rawYawRange = Math.abs(avgYaw - calibrationConfig.current.baselineYaw);
+      const rawPitchUpRange = Math.abs(avgPitch - calibrationConfig.current.baselinePitch);
+      calibrationConfig.current.yawRange = (rawYawRange * 1.2) + 10;
+      calibrationConfig.current.pitchUpRange = (rawPitchUpRange * 1.2) + 5;
       
-      // Chuyển sang Step 3 trên UI
       updateStep(3);
     }
     else if (currentStep === 3) {
@@ -210,35 +250,29 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       calibrationConfig.current.yawRange = Math.max(calibrationConfig.current.yawRange, currentYawRange, 25);
       calibrationConfig.current.pitchDownRange = Math.max(currentPitchDownRange, 30);
 
-      console.log("🎉 CALIBRATION COMPLETE:", calibrationConfig.current);
+      console.log("CALIBRATION COMPLETE:", calibrationConfig.current);
       updateStep(4); // Hoàn tất
     }
 
-    // 4. RESET DỮ LIỆU & PROGRESS
     tempCalibrationData.current = { yaw: [], pitch: [] };
     progressRef.current = 0;
     setCalibrationProgress(0);
 
-    // 5. SET TIMEOUT ĐỂ TIẾP TỤC (Tạo khoảng nghỉ 1.5 giây)
-    // Trong 1.5s này: Chấm đỏ đã chuyển vị trí mới, nhưng progress bar chưa chạy.
-    // Người dùng có thời gian để ổn định mắt tại vị trí mới.
     setTimeout(() => {
         if (calibrationStepRef.current < 4) {
             console.log("▶️ Tiếp tục thu thập dữ liệu...");
-            isPausedRef.current = false; // Mở khóa cho phép thu thập tiếp
+            isPausedRef.current = false; 
         } else {
-             isPausedRef.current = false; // Mở khóa cho mode giám sát
+             isPausedRef.current = false; 
         }
     }, 1500); // Delay 1.5 giây
   };
 
-  // --- 5. LOGIC PHÁT HIỆN TẬP TRUNG (DÙNG DỮ LIỆU ĐÃ HIỆU CHỈNH) ---
   const processAttention = (landmarks: any[]) => {
     const headPose = calculateHeadPose(landmarks);
     const gaze = calculateGaze(landmarks);
     const config = calibrationConfig.current;
 
-    // Tính độ lệch so với Baseline của người dùng (chứ không phải so với 0)
     const relativeYaw = headPose.yaw - config.baselineYaw;
     const relativePitch = headPose.pitch - config.baselinePitch;
 
@@ -285,7 +319,6 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
     }
   };
 
-  // Các hàm tính toán hình học (Giữ nguyên như phiên bản trước)
   const calculateHeadPose = (landmarks: any[]) => {
       const nose = landmarks[1];
       const leftEar = landmarks[454];
@@ -322,7 +355,6 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       return { x: (leftRatio + rightRatio) / 2 };
   };
 
-  // --- RENDER GIAO DIỆN ---
   // Nếu không ở Focus Mode -> Không render gì cả (hoặc null)
   if (!isFocusMode) {
     return null;
@@ -334,7 +366,7 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
         autoPlay 
         playsInline 
         muted 
-        className="hidden" 
+        className="opacity-0 w-0 h-0" 
         />
 
       {/* Sử dụng calibrationStepUI (State) để render */}
@@ -353,17 +385,14 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
           <div 
             className="absolute w-8 h-8 bg-red-500 rounded-full shadow-[0_0_20px_rgba(255,0,0,0.8)] animate-pulse transition-all duration-500"
             style={{
-              // Logic vị trí chấm đỏ
-              top: calibrationStepUI === 1 ? '50%' : (calibrationStepUI === 2 ? '20%' : '80%'),
-              left: calibrationStepUI === 1 ? '50%' : (calibrationStepUI === 2 ? '20%' : '80%'),
+              top: calibrationStepUI === 1 ? '50%' : (calibrationStepUI === 2 ? '10%' : '90%'),
+              left: calibrationStepUI === 1 ? '50%' : (calibrationStepUI === 2 ? '10%' : '90%'),
               transform: 'translate(-50%, -50%)'
             }}
           />
 
-          <p className="text-xl font-bold mt-10">
-            {calibrationStepUI === 1 && "Nhìn thẳng vào giữa màn hình"}
-            {calibrationStepUI === 2 && "Nhìn lên góc TRÁI màn hình"}
-            {calibrationStepUI === 3 && "Nhìn xuống góc PHẢI màn hình"}
+          <p className="mb-8 text-gray-300">
+            Hãy <span className="text-[#FFD966] font-bold">xoay đầu tự nhiên</span> để nhìn vào chấm đỏ nhé!
           </p>
         </div>
       )}

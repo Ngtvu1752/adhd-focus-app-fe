@@ -767,7 +767,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
         }}
         />
         <div className="fixed bottom-4 right-4 z-50 w-48">
-          <FocusDetector isFocusMode={focusMode} onFocusChange={handleFocusChange} />
+          <FocusDetector isFocusMode={mode === 'focus' && isActive} onFocusChange={handleFocusChange} />
           {distractionWarning && (
             <div className="absolute bottom-full mb-2 right-0 bg-red-500 text-white p-2 rounded-lg text-xs shadow-lg animate-bounce">
               ⚠️ {distractionWarning}
