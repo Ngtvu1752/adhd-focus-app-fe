@@ -55,20 +55,76 @@ export function RewardsShop() {
     if (savedRewards) {
       const allRewards = JSON.parse(savedRewards);
       setRewards(allRewards.filter((r: Reward) => r.active));
+    } else {
+      // Fake Data: Rewards
+      const fakeRewards: Reward[] = [
+        { id: '1', name: '30 Mins Screen Time', description: 'Watch TV or play games', pointsCost: 50, icon: '📺', active: true },
+        { id: '2', name: 'Ice Cream Treat', description: 'One scoop of favorite flavor', pointsCost: 100, icon: '🍦', active: true },
+        { id: '3', name: 'New Comic Book', description: 'Pick one from the store', pointsCost: 300, icon: '📚', active: true },
+        { id: '4', name: 'Pizza Night', description: 'Choose the toppings!', pointsCost: 500, icon: '🍕', active: true },
+        { id: '5', name: 'Park Visit', description: 'Go to the big playground', pointsCost: 150, icon: '🌳', active: true },
+        { id: '6', name: 'Stay Up Late', description: '30 extra minutes on weekend', pointsCost: 200, icon: '🌙', active: true },
+      ];
+      setRewards(fakeRewards);
+      localStorage.setItem('rewards', JSON.stringify(fakeRewards));
     }
 
     // Load user progress
     const savedProgress = localStorage.getItem('userProgress');
     if (savedProgress) {
       setUserProgress(JSON.parse(savedProgress));
+    } else {
+      // Fake Data: User Progress
+      const fakeProgress: UserProgress = {
+        totalPoints: 450,
+        level: 5,
+        currentLevelPoints: 50,
+        pointsToNextLevel: 100,
+        totalSessions: 25,
+        streak: 7
+      };
+      setUserProgress(fakeProgress);
+      localStorage.setItem('userProgress', JSON.stringify(fakeProgress));
     }
 
     // Load requests
     const savedRequests = localStorage.getItem('rewardRequests');
     if (savedRequests) {
       setRequests(JSON.parse(savedRequests));
+    } else {
+      // Fake Data: Requests History
+      const fakeRequests: RewardRequest[] = [
+        {
+          id: 'req-1',
+          rewardId: '2',
+          rewardName: 'Ice Cream Treat',
+          pointsCost: 100,
+          requestedAt: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
+          status: 'approved',
+          approvedAt: new Date(Date.now() - 86400000).toISOString() // 1 day ago
+        },
+        {
+          id: 'req-2',
+          rewardId: '1',
+          rewardName: '30 Mins Screen Time',
+          pointsCost: 50,
+          requestedAt: new Date().toISOString(),
+          status: 'pending'
+        },
+        {
+          id: 'req-3',
+          rewardId: '4',
+          rewardName: 'Pizza Night',
+          pointsCost: 500,
+          requestedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+          status: 'rejected'
+        }
+      ];
+      setRequests(fakeRequests);
+      localStorage.setItem('rewardRequests', JSON.stringify(fakeRequests));
     }
   };
+
 
   const canAfford = (pointsCost: number) => {
     return userProgress && userProgress.totalPoints >= pointsCost;
