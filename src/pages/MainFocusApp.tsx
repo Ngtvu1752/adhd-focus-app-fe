@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { BarChart3, Settings, User, Baby, LogOut, UserCircle, Smile } from 'lucide-react';
@@ -21,6 +21,9 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { Badge } from "../components/ui/badge";
+import { AVATAR_OPTIONS } from '../constrants/kidProfileData';
+
+import pomodoroLogo from "../assets/pomodoro-logo.png";
 
 type Page = 'parent-dashboard' | 'settings' | 'child-home' | 'kid-profile' | 'mascot-showcase' | 'rewards-shop';
 type UserMode = 'child' | 'parent';
@@ -34,9 +37,14 @@ export default function MainFocusApp() {
   const [userMode, setUserMode] = useState<UserMode>('child');
   //const [currentPage, setCurrentPage] = useState<Page>('child');
   const [currentPage, setCurrentPage] = useState<Page>('parent-dashboard');
+  const [displayProfile, setDisplayProfile] = useState({
+    name: user?.firstName || "Bé ngoan",
+    avatarEmoji: null as string | null,
+    avatarColor: '#FFD966' // Màu mặc định
+  });
 
-  const getUserName = () => user?.name || user?.username || "Người dùng";
-  const getUserInitials = () => (user?.name || user?.username || "U").substring(0, 2).toUpperCase();
+  const getUserName = () => user?.username || "Người dùng";
+  const getUserInitials = () => ( user?.username || "U").substring(0, 2).toUpperCase();
   const handleLogout = () => {
     logout();
     navigate('/login'); // Điều hướng về trang login
@@ -48,6 +56,12 @@ export default function MainFocusApp() {
     } else {
       setCurrentPage('child-home');
     }
+  };
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
   };
 
   const renderPage = () => {
@@ -72,6 +86,39 @@ export default function MainFocusApp() {
     }
 
   };
+  // Hàm load profile từ localStorage
+  const loadLocalProfile = () => {
+    try {
+      const saved = localStorage.getItem('kidProfile');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Tìm emoji tương ứng với avatarId
+        const avatarObj = AVATAR_OPTIONS.find(a => a.id === parsed.avatarId);
+        
+        setDisplayProfile({
+          name: parsed.name || user?.firstName || "Bé ngoan",
+          avatarEmoji: avatarObj?.emoji || null,
+          avatarColor: avatarObj?.color || '#FFD966'
+        });
+      }
+    } catch (e) {
+      console.error("Lỗi đọc profile", e);
+    }
+  };
+
+  // Effect: Load lần đầu + Lắng nghe sự kiện thay đổi
+  useEffect(() => {
+    loadLocalProfile(); // Load ngay khi vào app
+
+    // Lắng nghe sự kiện từ KidProfileSettings bắn sang
+    const handleProfileUpdate = () => loadLocalProfile();
+    window.addEventListener('kidProfileUpdated', handleProfileUpdate);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('kidProfileUpdated', handleProfileUpdate);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -85,17 +132,27 @@ export default function MainFocusApp() {
             {/* Vế trái: Tiêu đề và Vai trò */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <Button onClick={() => setCurrentPage('child-home')} variant="ghost" className="p-0 hover:bg-transparent">
+                <Button
+                  onClick={() => setCurrentPage('child-home')}
+                  variant="ghost"
+                  className="flex items-center gap-2 p-0 hover:bg-transparent"
+                >
                   <motion.div
-                    className="w-7 h-7 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: '#FFD966' }}
+                    className="w-7 h-7 rounded-full flex items-center justify-center overflow-hidden"
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                   >
-                    <span className="text-lg">🎯</span>
+                    <img
+                      src={pomodoroLogo}
+                      alt="FocusBuddy Logo"
+                      className="w-full h-full object-cover"
+                    />
                   </motion.div>
+                  <h2 className="font-semibold text-base" style={{ color: '#333333' }}>
+                    FocusBuddy
+                  </h2>
                 </Button>
-                <h2 className="font-semibold text-base" style={{ color: '#333333' }}>FocusBuddy</h2>
+
               </div>
               
               {/* Hiển thị vai trò (Parent/Child) */}
@@ -110,30 +167,72 @@ export default function MainFocusApp() {
                 {user?.role === 'parent' ? 'Parent' : 'Child'}
               </Badge>
             </div>
-
+            
             {/* Vế phải: Avatar và Menu */}
+            <div className="ml-auto flex items-center gap-3">
+            
+            {/* 1. TEXT CHÀO HỎI & TÊN */}
+            <div className="text-right hidden md:block">
+              <p className="text-xs text-gray-500 font-medium">
+                {getGreeting()}
+              </p>
+              <p className="text-sm font-bold text-gray-800">
+                {/* 🔥 SỬA: Sử dụng displayProfile.name để cập nhật tên ngay lập tức */}
+                {displayProfile.name} 
+              </p>
+            </div>
+
+            {/* 2. AVATAR & DROPDOWN */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button type="button" className="h-8 w-8 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2">
-                  <Avatar className="cursor-pointer h-8 w-8">
-                    <AvatarFallback 
-                      className={`text-xs ${
-                        user?.role === 'parent' 
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-blue-100 text-blue-800"
-                      }`}
+                <button type="button" className="rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2">
+                  
+                  {/* 🔥 SỬA: Logic hiển thị Avatar */}
+                  {displayProfile.avatarEmoji ? (
+                    // --- TRƯỜNG HỢP 1: Đã chọn Avatar con vật (từ Settings) ---
+                    <div 
+                      className="h-8 w-8 rounded-full flex items-center justify-center border-2 shadow-sm transition-transform hover:scale-105"
+                      style={{ 
+                        backgroundColor: displayProfile.avatarColor + '20', // Màu nền mờ 20%
+                        borderColor: displayProfile.avatarColor 
+                      }}
                     >
-                      {getUserInitials()}
-                    </AvatarFallback>
-                  </Avatar>
+                      <span className="text-lg pt-0.5 select-none leading-none">
+                        {displayProfile.avatarEmoji}
+                      </span>
+                    </div>
+                  ) : (
+                    // --- TRƯỜNG HỢP 2: Chưa chọn -> Dùng Avatar mặc định (Logic cũ) ---
+                    <Avatar className="cursor-pointer h-8 w-8">
+                      {/* Nếu user có ảnh thật từ Google/DB thì hiện ảnh */}
+                      {user?.avatarUrl ? (
+                         <AvatarImage src={user.avatarUrl} alt={user.username} />
+                      ) : null}
+
+                      {/* Fallback hiển thị chữ cái đầu */}
+                      <AvatarFallback 
+                        className={`text-xs font-bold ${
+                          user?.role === 'parent' 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {/* Lấy chữ cái đầu từ displayProfile cho đồng bộ */}
+                        {displayProfile.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+
                 </button>
               </DropdownMenuTrigger>
+
+              {/* --- PHẦN MENU DROPDOWN (Giữ nguyên logic cũ của bạn) --- */}
               <DropdownMenuContent className="w-56 z-[100]" align="end">
-              
+                
                 <DropdownMenuLabel>
                   <p className="text-sm font-medium">Tài khoản</p>
                   <p className="text-xs text-muted-foreground font-normal">
-                    {user?.name || user?.username}
+                    {user?.username}
                   </p>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -181,6 +280,7 @@ export default function MainFocusApp() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          </div>
           </div>
         </div>
       </header>

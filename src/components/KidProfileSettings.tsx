@@ -7,30 +7,12 @@ import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { FocusMascot } from './FocusMascot';
 import { toast } from 'sonner';
-
-const avatarOptions = [
-  { id: '1', emoji: '🦊', name: 'Fox', color: '#FF6B35' },
-  { id: '2', emoji: '🐻', name: 'Bear', color: '#8B4513' },
-  { id: '3', emoji: '🐰', name: 'Bunny', color: '#FFB6C1' },
-  { id: '4', emoji: '🐼', name: 'Panda', color: '#000000' },
-  { id: '5', emoji: '🦁', name: 'Lion', color: '#FFD700' },
-  { id: '6', emoji: '🐸', name: 'Frog', color: '#90EE90' },
-  { id: '7', emoji: '🐱', name: 'Cat', color: '#FFA500' },
-  { id: '8', emoji: '🐶', name: 'Dog', color: '#8B4513' },
-];
-
-const themeColors = [
-  { id: 'blue', name: 'Ocean Blue', primary: '#E8F5FF', secondary: '#4A90E2' },
-  { id: 'green', name: 'Nature Green', primary: '#DFF7E8', secondary: '#5CB85C' },
-  { id: 'yellow', name: 'Sunny Yellow', primary: '#FFF9E6', secondary: '#FFD966' },
-  { id: 'purple', name: 'Magic Purple', primary: '#F3E5F5', secondary: '#9C27B0' },
-  { id: 'pink', name: 'Sweet Pink', primary: '#FCE4EC', secondary: '#E91E63' },
-];
+import {AVATAR_OPTIONS, THEME_COLORS} from '../constrants/kidProfileData';
 
 export function KidProfileSettings() {
   const [name, setName] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState(avatarOptions[0]);
-  const [selectedTheme, setSelectedTheme] = useState(themeColors[0]);
+  const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_OPTIONS[0]);
+  const [selectedTheme, setSelectedTheme] = useState(THEME_COLORS[0]);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showSaveAnimation, setShowSaveAnimation] = useState(false);
 
@@ -40,8 +22,8 @@ export function KidProfileSettings() {
     if (savedProfile) {
       const profile = JSON.parse(savedProfile);
       setName(profile.name || '');
-      setSelectedAvatar(avatarOptions.find(a => a.id === profile.avatarId) || avatarOptions[0]);
-      setSelectedTheme(themeColors.find(t => t.id === profile.themeId) || themeColors[0]);
+      setSelectedAvatar(AVATAR_OPTIONS.find(a => a.id === profile.avatarId) || AVATAR_OPTIONS[0]);
+      setSelectedTheme(THEME_COLORS.find(t => t.id === profile.themeId) || THEME_COLORS[0]);
       setSoundEnabled(profile.soundEnabled ?? true);
     }
   }, []);
@@ -54,7 +36,7 @@ export function KidProfileSettings() {
       soundEnabled,
     };
     localStorage.setItem('kidProfile', JSON.stringify(profile));
-    
+    window.dispatchEvent(new Event('kidProfileUpdated'));
     setShowSaveAnimation(true);
     toast.success('Profile saved! 🎉');
     
@@ -134,7 +116,7 @@ export function KidProfileSettings() {
                 <h3 style={{ color: '#333333' }}>Choose Your Avatar</h3>
               </div>
               <div className="grid grid-cols-4 gap-3">
-                {avatarOptions.map((avatar) => (
+                {AVATAR_OPTIONS.map((avatar) => (
                   <motion.button
                     key={avatar.id}
                     onClick={() => setSelectedAvatar(avatar)}
@@ -178,7 +160,7 @@ export function KidProfileSettings() {
                 <h3 style={{ color: '#333333' }}>Pick Your Theme</h3>
               </div>
               <div className="space-y-3">
-                {themeColors.map((theme) => (
+                {THEME_COLORS.map((theme) => (
                   <motion.button
                     key={theme.id}
                     onClick={() => setSelectedTheme(theme)}

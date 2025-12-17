@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
-interface FocusDetectorProps {
-  isFocusMode: boolean; 
-  onFocusChange: (status: 'FOCUSED' | 'DISTRACTED' | 'ABSENT', reason?: string) => void;
-}
+export type MascotMood = 'happy' | 'focused' | 'celebrating' | 'resting' | 'frustrated' | 'bored' | 'stressed' | 'surprised';
 
+interface FocusDetectorProps {
+  isFocusMode: boolean;
+  onFocusChange: (status: 'FOCUSED' | 'DISTRACTED' | 'ABSENT', reason?: string) => void;
+  onMoodChange?: (mood: MascotMood) => void;
+}
 // Cấu trúc dữ liệu hiệu chỉnh
 interface CalibrationData {
   baselineYaw: number;   // Góc quay đầu tự nhiên khi nhìn thẳng
@@ -15,7 +17,7 @@ interface CalibrationData {
   pitchDownRange: number;// Biên độ cúi xuống cho phép
 }
 
-export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFocusChange }) => {
+export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFocusChange, onMoodChange }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
@@ -24,6 +26,12 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
   const isPausedRef = useRef<boolean>(false);
   const lastValidHeadPoseRef = useRef<{ yaw: number, pitch: number }>({ yaw: 0, pitch: 0 });
   const missingFaceFramesRef = useRef<number>(0);
+  const lastMoodRef = useRef<MascotMood>('focused');
+  const smoothedScoresRef = useRef({
+    smile: 0,
+    frown: 0,
+    surprise: 0
+  });
   // Step: 0 (Chưa bắt đầu), 1 (Nhìn Tâm), 2 (Nhìn Góc Trái Trên), 3 (Nhìn Góc Phải Dưới), 4 (Hoàn tất)
   const [calibrationStep, setCalibrationStep] = useState<number>(0); 
   const [calibrationProgress, setCalibrationProgress] = useState(0);
@@ -144,6 +152,10 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
         } else if (currentStep === 4) {
           processAttention(landmarks);
         }
+
+        if (results.faceBlendshapes && results.faceBlendshapes.length > 0) {
+           detectEmotion(results.faceBlendshapes[0].categories);
+        }
       } else {
          // MẤT DẤU KHUÔN MẶT
         
@@ -182,6 +194,63 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
     }
   };
 
+  const detectEmotion = (blendshapes: any[]) => {
+    const getScore = (name: string) => blendshapes.find(b => b.categoryName === name)?.score || 0;
+
+    // 1. Lấy dữ liệu thô (Raw Data)
+    const rawSmile = (getScore('mouthSmileLeft') + getScore('mouthSmileRight')) / 2;
+    const rawFrown = (getScore('browDownLeft') + getScore('browDownRight')) / 2;
+    const rawSurprise = getScore('browInnerUp');
+
+    const smoothFactor = 0.7; 
+    
+    smoothedScoresRef.current.smile = (smoothedScoresRef.current.smile * smoothFactor) + (rawSmile * (1 - smoothFactor));
+    smoothedScoresRef.current.frown = (smoothedScoresRef.current.frown * smoothFactor) + (rawFrown * (1 - smoothFactor));
+    smoothedScoresRef.current.surprise = (smoothedScoresRef.current.surprise * smoothFactor) + (rawSurprise * (1 - smoothFactor));
+
+    const { smile, frown, surprise } = smoothedScoresRef.current;
+
+    const currentMood = lastMoodRef.current;
+
+    let detectedMood: MascotMood = 'focused'; // Mặc định
+
+    const isSmiling = currentMood === 'happy' || currentMood === 'celebrating'
+        ? smile > 0.4 
+        : smile > 0.6;
+
+    // --- LOGIC STRESSED ---
+    const isStressed = currentMood === 'stressed' 
+        ? frown > 0.4 
+        : frown > 0.55;
+
+    // --- LOGIC SURPRISED ---
+    const isSurprised = currentMood === 'surprised' 
+        ? surprise > 0.4 
+        : surprise > 0.55;
+
+    // 4. Quyết định Mood (Ưu tiên)
+    if (isSmiling) {
+        detectedMood = smile > 0.85 ? 'celebrating' : 'happy';
+    } else if (isStressed) {
+        detectedMood = 'stressed';
+    } else if (isSurprised) {
+        detectedMood = 'surprised';
+    }
+
+    // 5. Chỉ update khi có thay đổi
+    if (currentMood !== detectedMood) {
+        lastMoodRef.current = detectedMood;
+        if (onMoodChange) onMoodChange(detectedMood);
+        console.log(`Mood changed: ${detectedMood} (Smile: ${smile.toFixed(2)})`);
+    }
+  };
+
+  const handleMoodUpdate = (newMood: MascotMood) => {
+      if (lastMoodRef.current !== newMood) {
+          lastMoodRef.current = newMood;
+          if (onMoodChange) onMoodChange(newMood);
+      }
+  };
   // --- 4. LOGIC HIỆU CHỈNH (CALIBRATION) ---
   const processCalibration = (landmarks: any[]) => {
     const headPose = calculateHeadPose(landmarks);

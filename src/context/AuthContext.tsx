@@ -3,11 +3,13 @@ import authApi from '../api/authApi';
 interface User {
   id?: string;
   username: string; // Đổi từ email sang username
-  name: string;
+  lastName?: string;
+  firstName?: string;
   role: 'parent' | 'child';
   totalPoints: number;
   userLevel: number;
   currentStreak: number;
+  avatarUrl?: string;
 }
 interface AuthContextType {
   user: User | null;
@@ -67,7 +69,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Chúng ta lấy luôn username người dùng nhập để làm tên hiển thị
       const userData: User = {
         username: username,
-        name: username, // Có thể đổi thành tên thật nếu có API lấy info
+        firstName: response.user?.firstName || "",
+        lastName: response.user?.lastName || "",
         role: isParent ? 'parent' : 'child', // Map lại về role của App Frontend
         id: response.user.id, // Giả sử backend trả về userId khi login
         totalPoints: response.user?.totalPoints ?? 0,

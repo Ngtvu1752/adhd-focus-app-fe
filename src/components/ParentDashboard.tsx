@@ -10,7 +10,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Card } from "./ui/card";
-import { Progress } from "./ui/progress";
 
 interface Completion {
   date: string;
@@ -18,6 +17,47 @@ interface Completion {
   duration: number;
   type: "focus" | "break";
 }
+
+const mockTasks = [
+  "Math practice",
+  "Reading adventure",
+  "Science quiz",
+  "Coding mini project",
+  "Creative writing",
+  "Art project",
+  "Focus session",
+];
+
+const createMockCompletions = (): Completion[] => {
+  const now = new Date();
+  const completions: Completion[] = [];
+
+  // Keep a visible streak for the last five days
+  for (let i = 0; i < 5; i++) {
+    const date = new Date(now);
+    date.setDate(now.getDate() - i);
+    completions.push({
+      date: new Date(date.setHours(9 + i, 15)).toISOString(),
+      task: mockTasks[i % mockTasks.length],
+      duration: 20 + (i % 3) * 5,
+      type: "focus",
+    });
+  }
+
+  // Add variety for the prior week
+  for (let d = 5; d < 12; d++) {
+    const date = new Date(now);
+    date.setDate(now.getDate() - d);
+    completions.push({
+      date: new Date(date.setHours(10 + (d % 3) * 2, 30)).toISOString(),
+      task: mockTasks[d % mockTasks.length],
+      duration: 15 + (d % 4) * 5,
+      type: d % 3 === 0 ? "break" : "focus",
+    });
+  }
+
+  return completions;
+};
 
 export function ParentDashboard() {
   const [completions, setCompletions] = useState<Completion[]>([]);
@@ -34,7 +74,13 @@ export function ParentDashboard() {
   }, []);
 
   const loadStats = () => {
-    const data: Completion[] = JSON.parse(localStorage.getItem("completions") || "[]");
+    let data: Completion[] = JSON.parse(localStorage.getItem("completions") || "[]");
+
+    if (!data.length) {
+      data = createMockCompletions();
+      localStorage.setItem("completions", JSON.stringify(data));
+    }
+
     setCompletions(data);
 
     const totalSessions = data.length;

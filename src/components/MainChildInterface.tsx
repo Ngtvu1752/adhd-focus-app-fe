@@ -19,9 +19,11 @@ import { useAuth } from '../context/AuthContext';
 import authApi from '../api/authApi';
 import { themes } from './util/colorTheme';
 
-import { FocusDetector } from './Mediapipe/FocusDetector';
+import { FocusDetector, MascotMood } from './Mediapipe/FocusDetector';
 import { FocusBuddyReminder } from './FocusBuddyReminder';
 import {RewardsShop} from './RewardsShop';
+import { useSoundEffects } from '../hooks/useSoundEffects';
+import { useTTS } from '../hooks/useTTS';
 
 type TimerMode = 'focus' | 'short' | 'long';
 
@@ -39,7 +41,8 @@ interface MainChildInterfaceProps {
 
 export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
   const { user } = useAuth();
-  
+  const { speak } = useTTS(); 
+  const { playSound } = useSoundEffects();
   // --- States ---
   const [tasks, setTasks] = useState<Task[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
@@ -54,11 +57,17 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
   const [focusMode, setFocusMode] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const lastReminderTimeRef = useRef<number>(0);
+  const lastSoundTimeRef = useRef<number>(0);
+  const SFX_COOLDOWN = 5000;
+
+  const [mascotMood, setMascotMood] = useState<MascotMood>('focused');
+  const [faceEmotion, setFaceEmotion] = useState<MascotMood>('focused');
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const theme = themes[mode];
   const MAX_POMODORO = 4; 
-
+  const REMINDER_COOLDOWN_MS = 15000;
   const calculateLevelInfo = (totalPoints: number) => {
     const level = Math.floor(totalPoints / 100) + 1;
     const currentLevelPoints = totalPoints % 100;
@@ -109,11 +118,21 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
   }, [user?.id]);
 
   useEffect(() => {
+     // Chào buổi sáng/chiều
+     const hour = new Date().getHours();
+     const greeting = hour < 12 ? "Chào buổi sáng" : "Chào buổi chiều";
+     
+     speak(`${greeting} {name}, hôm nay con muốn học bài gì nào?`, "greeting");
+  }, []);
+
+  useEffect(() => {
     let interval: number | null = null;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     } else if (timeLeft === 0) {
       handleTimerComplete();
+      playSound('timer_finish');
+      speak("Hết giờ rồi! Chúng mình cùng nghỉ giải lao một chút nhé.", "timer-end");
     }
     return () => { if (interval) clearInterval(interval); };
   }, [isActive, timeLeft]);
@@ -197,6 +216,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
       setIsActive(false);
       return;
     }
+    playSound('start_timer');
 
     const isNewSession = timeLeft === sessionDuration;
     
@@ -268,6 +288,8 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
         setTimeLeft(25 * 60);
         toast.success(`Tuyệt vời! Bạn vừa hoàn thành "${currentTask.title}" 🌟`, { duration: 5000 });
       }, 2000);
+      setTimeout(() => {
+        speak("Hoan hô {name}! Bé làm tốt lắm!", "task-complete");}, 500);
     } catch (error) {
       console.error("Lỗi:", error);
       toast.error("Không thể cập nhật lúc này.");
@@ -299,7 +321,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
 
   const handleTimerComplete = async () => {
     setIsActive(false);
-    playSound();
+    playSoundDone();
     
     if (mode === 'focus') {
       // Hoàn thành phiên tập trung
@@ -372,7 +394,8 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
     return { level, currentLevelPoints, pointsToNextLevel: 100 - currentLevelPoints };
   };
 
-  const playSound = () => {
+
+  const playSoundDone = () => {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const osc = ctx.createOscillator(); const gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
@@ -414,13 +437,48 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
   // Hàm callback xử lý khi AI phát hiện thay đổi
   const handleFocusChange = (status: 'FOCUSED' | 'DISTRACTED' | 'ABSENT', reason?: string) => {
     setFocusState(status);
-    
+    console.log("Focus status changed to:", status);
+    if (status === 'DISTRACTED') {
+        setMascotMood('frustrated');
+    } else if (status === 'ABSENT') {
+        setMascotMood('bored'); 
+    } else {
+        setMascotMood(faceEmotion);
+    }
     if (status === 'DISTRACTED' || status === 'ABSENT') {
+      const now = Date.now();
       setDistractionWarning(reason || 'Mất tập trung');
-      // Có thể tạm dừng đồng hồ nếu mất tập trung quá lâu (ví dụ > 5 giây)
+      if (now - lastSoundTimeRef.current > SFX_COOLDOWN) {
+           playSound('gentle_reminder'); // Kêu "Bloop"
+           lastSoundTimeRef.current = now; // Cập nhật thời gian
+       }
+      if (now - lastReminderTimeRef.current > REMINDER_COOLDOWN_MS){
+              const messages = [
+            "{name} ơi, quay lại ngồi học nào!",
+            "Cố lên {name}, sắp xong bài rồi!",
+            "Ơ kìa {name}, đừng nhìn đi chỗ khác nhé!"
+          ];
+     // Chọn ngẫu nhiên 1 câu
+          const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+     
+        speak(randomMsg, "timer-end");
+        lastReminderTimeRef.current = now;
+      }
     } else {
       setDistractionWarning(null);
     }
+    // Nếu chuyển từ mất tập trung sang bình thường -> Khen ngợi
+    if (status === 'FOCUSED' && focusState !== 'FOCUSED') {
+       playSound('back_to_focus');
+    }
+  };
+
+  const handleMoodChange = (detectedMood: MascotMood) => {
+    setFaceEmotion(detectedMood); // Lưu cảm xúc thật lại
+    setMascotMood(prev => {
+        if (prev === 'frustrated' || prev === 'bored') return prev;
+        return detectedMood;
+    });
   };
 
   const isDistracted = focusState === 'DISTRACTED' || focusState === 'ABSENT';
@@ -633,7 +691,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                         />
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <FocusMascot mood={getMascotMood()} size={focusMode ? 140 : 120} />
+                        <FocusMascot mood={mascotMood} size={focusMode ? 140 : 120} />
                       </div>
                     </div>
                   </div>
@@ -767,7 +825,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
         }}
         />
         <div className="fixed bottom-4 right-4 z-50 w-48">
-          <FocusDetector isFocusMode={mode === 'focus' && isActive} onFocusChange={handleFocusChange} />
+          <FocusDetector isFocusMode={mode === 'focus' && isActive} onFocusChange={handleFocusChange} onMoodChange={handleMoodChange}/>
           {distractionWarning && (
             <div className="absolute bottom-full mb-2 right-0 bg-red-500 text-white p-2 rounded-lg text-xs shadow-lg animate-bounce">
               ⚠️ {distractionWarning}
