@@ -31,8 +31,8 @@ const LoginPage = () => {
 
         {/* Sign Up Container */}
         <div className={`absolute top-0 h-full w-1/2 transition-all duration-[600ms] ease-custom-bezier left-0 ${isRightPanelActive ? 'translate-x-full opacity-100 z-[5]' : 'translate-x-0 opacity-0 z-[1]'}`}>
-          <SignUpForm isParent={isParent} 
-            setIsParent={true}/>
+          <SignUpForm isParent={true} 
+            setIsParent={setIsParent}/>
         </div>
 
         {/* Overlay Container */}
