@@ -181,10 +181,10 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
                  
                  // Giữ UI màu xanh (Fake detected) để bé không bị xao nhãng
              } else {
-                 onFocusChange('DISTRACTED', 'Quay đầu quá nhiều');
+                 onFocusChange('DISTRACTED', 'Mình cùng nhìn thẳng vào màn hình nhé!');
              }
          } else {
-             onFocusChange('ABSENT', 'Không thấy khuôn mặt');
+             onFocusChange('ABSENT', 'Bạn ơi, quay lại ghế ngồi nào!');
          }
       }
     }
@@ -351,22 +351,22 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
     // So sánh với Range cá nhân hóa
     if (Math.abs(relativeYaw) > config.yawRange) {
       isDistracted = true;
-      reason = 'Quay đầu quá nhiều';
+      reason = 'Mình cùng nhìn thẳng vào màn hình nhé!';
     } 
     // Pitch: Cúi quá ngưỡng cho phép HOẶC Ngửa quá ngưỡng cho phép
     // Lưu ý: Giả định Pitch > 0 là cúi, Pitch < 0 là ngửa (cần check log thực tế)
     else if (relativePitch > config.pitchDownRange) {
       isDistracted = true;
-      reason = 'Cúi đầu quá thấp';
+      reason = 'Ngồi thẳng lưng lên cho khỏe nào!';
     }
     else if (relativePitch < -config.pitchUpRange) {
       isDistracted = true;
-      reason = 'Ngửa đầu quá cao';
+      reason = 'Nhìn xuống bài học chút xíu nào!';
     }
     // Gaze: Vẫn dùng ngưỡng cứng cho mắt vì mắt di chuyển rất nhanh
     else if (Math.abs(gaze.x) > 0.25) { // Tăng nhẹ lên 0.25 cho đỡ nhạy
       isDistracted = true;
-      reason = 'Mắt không nhìn màn hình';
+      reason = 'Mắt xinh tập trung vào bài nhé!';
     }
 
     // Debounce Logic (Chống nhiễu)
