@@ -435,7 +435,7 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
         autoPlay 
         playsInline 
         muted 
-        className="opacity-0 w-0 h-0" 
+        className="fixed bottom-4 right-4 w-32 h-24 rounded-lg border-2 border-white shadow-lg z-[50] object-cover" 
         />
 
       {/* Sử dụng calibrationStepUI (State) để render */}
