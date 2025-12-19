@@ -36,21 +36,16 @@ const taskApi = {
     return axiosClient.get(`/tasks/supervisor/${supervisorId}`) as Promise<Task[]>;
   },
 
-  // 2. GET /tasks (với childId query)
-  // Supervisor lọc nhiệm vụ theo Child cụ thể
   getTasksByFilter: (childId: string) => {
     return axiosClient.get('/tasks', {
       params: { childId }
     }) as Promise<Task[]>;
   },
 
-  // 3. GET /tasks/:id
   getTaskDetail: (id: string) => {
     return axiosClient.get(`/tasks/${id}`) as Promise<Task>;
   },
 
-  // 4. GET /tasks/child/:childId
-  // Lấy danh sách nhiệm vụ của Child (Dành cho Child view hoặc Supervisor view trực tiếp)
   getTasksByChildId: (childId: string) => {
     return axiosClient.get(`/tasks/child/${childId}`) as Promise<Task[]>;
   },

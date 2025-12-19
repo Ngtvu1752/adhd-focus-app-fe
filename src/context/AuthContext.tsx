@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import authApi from '../api/authApi';
 interface User {
   id?: string;
-  username: string; // Đổi từ email sang username
+  username: string; 
   lastName?: string;
   firstName?: string;
   role: 'parent' | 'child';
@@ -46,33 +46,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = async (username: string, password: string, isParent: boolean = true) => {
     try {
-      // 1. Xác định role gửi lên Server
-      // Ví dụ: Parent -> "SUPERVISOR", Child -> "CHILD" (hoặc tên role bên backend quy định cho con)
       const apiRole = isParent ? "SUPERVISOR" : "CHILD";
 
-      // 2. Gọi API
       const response: any = await authApi.login({ 
         username, 
         password, 
         role: apiRole 
       });
       console.log("Login Response:", response);
-      // Response mẫu: { message: "...", token: "..." }
       const { token } = response;
 
       if (!token) throw new Error("Không nhận được token từ server");
 
-      // 3. Lưu Token
       localStorage.setItem('accessToken', token);
 
-      // 4. Tạo đối tượng User để lưu vào App (Vì API không trả về info user)
-      // Chúng ta lấy luôn username người dùng nhập để làm tên hiển thị
       const userData: User = {
         username: username,
         firstName: response.user?.firstName || "",
         lastName: response.user?.lastName || "",
-        role: isParent ? 'parent' : 'child', // Map lại về role của App Frontend
-        id: response.user.id, // Giả sử backend trả về userId khi login
+        role: isParent ? 'parent' : 'child', 
+        id: response.user.id, 
         totalPoints: response.user?.totalPoints ?? 0,
         userLevel: response.user?.userLevel ?? 0,
         currentStreak: response.user?.currentStreak ?? 0
@@ -98,7 +91,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         password, 
         role: apiRole 
       });
-      // Trả về đối tượng User sau khi đăng ký thành công
       await login(username, password, isParent);
     } catch (error) {
       console.error("Signup Error:", error);

@@ -362,7 +362,6 @@ export default function MainFocusApp() {
         </nav>
       )}
 
-      {/* 8. XÓA BỎ: Khoảng đệm h-24 không còn cần thiết vì navbar dưới cùng là 'sticky' */}
     </div>
   );
 }

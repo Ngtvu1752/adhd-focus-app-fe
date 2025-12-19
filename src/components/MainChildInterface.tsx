@@ -80,7 +80,6 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
 
   useEffect(() => {
     if (user) {
-      // Nếu có user (từ API login), tính toán lại progress dựa trên user.totalPoints
       const points = user.totalPoints || 0;
       const levelInfo = calculateLevelInfo(points);
       
@@ -88,17 +87,11 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
         ...prev,
         totalPoints: points,
         streak: user.currentStreak || 0,
-        level: user.userLevel || levelInfo.level, // Ưu tiên level từ DB, nếu k có thì tự tính
+        level: user.userLevel || levelInfo.level, 
         currentLevelPoints: levelInfo.currentLevelPoints,
         pointsToNextLevel: levelInfo.pointsToNextLevel,
-        // totalSessions có thể cần API riêng, tạm thời giữ nguyên hoặc lấy từ localStorage nếu muốn
       }));
     } else {
-      // Fallback: Nếu không có user (chưa login/mất mạng), thử lấy từ localStorage
-      //const savedProgress = localStorage?.getItem('userProgress');
-      //if (savedProgress) {
-        //setUserProgress(JSON.parse(savedProgress));
-      //}
       console.log("No user data available to load progress.");
     }
   }, [user]);

@@ -56,7 +56,6 @@ export function RewardsShop() {
       const allRewards = JSON.parse(savedRewards);
       setRewards(allRewards.filter((r: Reward) => r.active));
     } else {
-      // Fake Data: Rewards
       const fakeRewards: Reward[] = [
         { id: '1', name: '30 phút xem màn hình', description: 'Xem TV hoặc chơi game', pointsCost: 50, icon: '📺', active: true },
         { id: '2', name: 'Một cây kem', description: 'Một viên kem vị yêu thích', pointsCost: 100, icon: '🍦', active: true },
@@ -74,7 +73,6 @@ export function RewardsShop() {
     if (savedProgress) {
       setUserProgress(JSON.parse(savedProgress));
     } else {
-      // Fake Data: User Progress
       const fakeProgress: UserProgress = {
         totalPoints: 450,
         level: 5,
@@ -92,7 +90,6 @@ export function RewardsShop() {
     if (savedRequests) {
       setRequests(JSON.parse(savedRequests));
     } else {
-      // Fake Data: Requests History
       const fakeRequests: RewardRequest[] = [
         {
           id: 'req-1',
@@ -142,7 +139,6 @@ export function RewardsShop() {
   const handleConfirmRedeem = () => {
     if (!selectedReward || !userProgress) return;
 
-    // Deduct points
     const newProgress = {
       ...userProgress,
       totalPoints: userProgress.totalPoints - selectedReward.pointsCost
@@ -150,7 +146,6 @@ export function RewardsShop() {
     localStorage.setItem('userProgress', JSON.stringify(newProgress));
     setUserProgress(newProgress);
 
-    // Create request
     const newRequest: RewardRequest = {
       id: Date.now().toString(),
       rewardId: selectedReward.id,

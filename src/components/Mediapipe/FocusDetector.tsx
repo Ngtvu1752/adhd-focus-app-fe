@@ -8,7 +8,6 @@ interface FocusDetectorProps {
   onFocusChange: (status: 'FOCUSED' | 'DISTRACTED' | 'ABSENT', reason?: string) => void;
   onMoodChange?: (mood: MascotMood) => void;
 }
-// Cấu trúc dữ liệu hiệu chỉnh
 interface CalibrationData {
   baselineYaw: number;   // Góc quay đầu tự nhiên khi nhìn thẳng
   baselinePitch: number; // Góc cúi/ngửa tự nhiên khi nhìn thẳng
@@ -32,7 +31,6 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
     frown: 0,
     surprise: 0
   });
-  // Step: 0 (Chưa bắt đầu), 1 (Nhìn Tâm), 2 (Nhìn Góc Trái Trên), 3 (Nhìn Góc Phải Dưới), 4 (Hoàn tất)
   const [calibrationStep, setCalibrationStep] = useState<number>(0); 
   const [calibrationProgress, setCalibrationProgress] = useState(0);
   const [calibrationStepUI, setCalibrationStepUI] = useState<number>(0);
@@ -45,7 +43,7 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
   // Dữ liệu chuẩn sau khi hiệu chỉnh xong
   const calibrationConfig = useRef<CalibrationData>({
     baselineYaw: 0, baselinePitch: 0,
-    yawRange: 30, pitchUpRange: 20, pitchDownRange: 45 // Giá trị mặc định an toàn
+    yawRange: 30, pitchUpRange: 20, pitchDownRange: 45 
   });
 
   // Biến đếm chống nhiễu
@@ -73,7 +71,7 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
     };
     initMediaPipe();
 
-    return () => stopCamera(); // Cleanup khi unmount
+    return () => stopCamera(); 
   }, []);
 
   useEffect(() => {
@@ -98,7 +96,6 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        // Đảm bảo video play
         videoRef.current.play(); 
         videoRef.current.addEventListener("loadeddata", predictWebcam);
       }
@@ -119,7 +116,7 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       const tracks = stream.getTracks();
       
       tracks.forEach(track => {
-        track.stop(); // Lệnh này sẽ tắt đèn xanh trên camera vật lý
+        track.stop();
         // console.log("📷 Camera Track Stopped:", track.label);
       });
 
@@ -139,11 +136,10 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       const currentStep = calibrationStepRef.current;
 
       if (results.faceLandmarks && results.faceLandmarks.length > 0) {
-        missingFaceFramesRef.current = 0; // Reset bộ đếm
+        missingFaceFramesRef.current = 0; 
 
         const landmarks = results.faceLandmarks[0];
-        
-        // Cập nhật tư thế cuối cùng
+
         const currentPose = calculateHeadPose(landmarks);
         lastValidHeadPoseRef.current = currentPose;
 
@@ -157,20 +153,13 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
            detectEmotion(results.faceBlendshapes[0].categories);
         }
       } else {
-         // MẤT DẤU KHUÔN MẶT
-        
-         // Tăng bộ đếm frame bị mất
          missingFaceFramesRef.current++;
 
-         // LẤY DỮ LIỆU CUỐI CÙNG ĐỂ SUY LUẬN
          const lastPitch = lastValidHeadPoseRef.current.pitch - calibrationConfig.current.baselinePitch;
          const lastYaw = lastValidHeadPoseRef.current.yaw - calibrationConfig.current.baselineYaw;
 
-         // Điều kiện: Góc cúi cuối cùng > 15 độ (tương đối so với baseline)
          const isLookingDown = lastPitch > 15; 
-         
-         // Nếu đang cúi viết bài, cho phép mất mặt tới 450 frames (khoảng 15 giây)
-         // Nếu chỉ quay đầu, chỉ cho phép 90 frames (3 giây)
+
          const limitFrames = isLookingDown ? 450 : 90;
 
          if (missingFaceFramesRef.current < limitFrames) {
@@ -353,8 +342,8 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       isDistracted = true;
       reason = 'Mình cùng nhìn thẳng vào màn hình nhé!';
     } 
-    // Pitch: Cúi quá ngưỡng cho phép HOẶC Ngửa quá ngưỡng cho phép
-    // Lưu ý: Giả định Pitch > 0 là cúi, Pitch < 0 là ngửa (cần check log thực tế)
+    // Cúi quá ngưỡng cho phép HOẶC Ngửa quá ngưỡng cho phép
+    // Giả định Pitch > 0 là cúi, Pitch < 0 là ngửa (cần check log thực tế)
     else if (relativePitch > config.pitchDownRange) {
       isDistracted = true;
       reason = 'Ngồi thẳng lưng lên cho khỏe nào!';
@@ -364,7 +353,7 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       reason = 'Nhìn xuống bài học chút xíu nào!';
     }
     // Gaze: Vẫn dùng ngưỡng cứng cho mắt vì mắt di chuyển rất nhanh
-    else if (Math.abs(gaze.x) > 0.25) { // Tăng nhẹ lên 0.25 cho đỡ nhạy
+    else if (Math.abs(gaze.x) > 0.25) { 
       isDistracted = true;
       reason = 'Mắt xinh tập trung vào bài nhé!';
     }
@@ -377,7 +366,7 @@ export const FocusDetector: React.FC<FocusDetectorProps> = ({ isFocusMode, onFoc
       onFocusChange('FOCUSED');
     }
 
-    if (distractionStreakRef.current > 90) { // ~1.5s
+    if (distractionStreakRef.current > 90) {
       onFocusChange('DISTRACTED', reason);
     }
     

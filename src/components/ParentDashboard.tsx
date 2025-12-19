@@ -18,7 +18,6 @@ interface Completion {
   type: "focus" | "break";
 }
 
-// Mock data riêng cho từng trẻ
 const mockDataChild1: Completion[] = [
   { date: new Date(Date.now() - 86400000 * 1).toISOString(), task: "Toán học vui", duration: 25, type: "focus" },
   { date: new Date(Date.now() - 86400000 * 2).toISOString(), task: "Đọc truyện", duration: 30, type: "focus" },
@@ -126,14 +125,11 @@ export function ParentDashboard() {
       (c: Completion) => new Date(c.date) >= oneWeekAgo
     ).length;
 
-    // --- Average per day ---
     const avgPerDay = Math.round(thisWeek / 7);
 
-    // --- Calculate streak ---
     let streak = 0;
     const today = new Date();
 
-    // ✅ FIXED: ensure `a` and `b` are typed as string
     const sortedDates = [...new Set(data.map((c) => new Date(c.date).toDateString()))]
       .sort(
         (a: string, b: string) =>
