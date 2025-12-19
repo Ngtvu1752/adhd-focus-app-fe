@@ -18,6 +18,21 @@ interface Completion {
   type: "focus" | "break";
 }
 
+// Mock data riêng cho từng trẻ
+const mockDataChild1: Completion[] = [
+  { date: new Date(Date.now() - 86400000 * 1).toISOString(), task: "Toán học vui", duration: 25, type: "focus" },
+  { date: new Date(Date.now() - 86400000 * 2).toISOString(), task: "Đọc truyện", duration: 30, type: "focus" },
+  { date: new Date(Date.now() - 86400000 * 3).toISOString(), task: "Vẽ tranh", duration: 45, type: "focus" },
+  { date: new Date(Date.now() - 86400000 * 4).toISOString(), task: "Học tiếng Anh", duration: 20, type: "focus" },
+  { date: new Date(Date.now() - 86400000 * 5).toISOString(), task: "Lắp ráp Lego", duration: 60, type: "break" },
+];
+
+const mockDataChild2: Completion[] = [
+  { date: new Date(Date.now() - 86400000 * 1).toISOString(), task: "Tập viết", duration: 15, type: "focus" },
+  { date: new Date(Date.now() - 86400000 * 2).toISOString(), task: "Học hát", duration: 20, type: "focus" },
+  { date: new Date(Date.now() - 86400000 * 3).toISOString(), task: "Xem hoạt hình", duration: 30, type: "break" },
+];
+
 const mockTasks = [
   "Math practice",
   "Reading adventure",
@@ -60,6 +75,7 @@ const createMockCompletions = (): Completion[] => {
 };
 
 export function ParentDashboard() {
+  const [selectedChild, setSelectedChild] = useState<any>(null);
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [stats, setStats] = useState({
     totalSessions: 0,
@@ -71,14 +87,28 @@ export function ParentDashboard() {
 
   useEffect(() => {
     loadStats();
-  }, []);
+  }, [selectedChild]); // Reload khi chọn trẻ khác
 
   const loadStats = () => {
-    let data: Completion[] = JSON.parse(localStorage.getItem("completions") || "[]");
+    let data: Completion[] = [];
 
-    if (!data.length) {
-      data = createMockCompletions();
-      localStorage.setItem("completions", JSON.stringify(data));
+    if (selectedChild) {
+      // Nếu đã chọn trẻ, dùng mock data tương ứng
+      if (selectedChild.id === 'child1') {
+        data = mockDataChild1;
+      } else if (selectedChild.id === 'child2') {
+        data = mockDataChild2;
+      } else {
+        // Fallback nếu id không khớp
+        data = createMockCompletions();
+      }
+    } else {
+      // Mặc định lấy từ localStorage hoặc tạo mới
+      data = JSON.parse(localStorage.getItem("completions") || "[]");
+      if (!data.length) {
+        data = createMockCompletions();
+        localStorage.setItem("completions", JSON.stringify(data));
+      }
     }
 
     setCompletions(data);
@@ -155,24 +185,58 @@ export function ParentDashboard() {
     return Object.entries(weekData).map(([day, count]) => ({ day, count }));
   };
 
+  const getWeeklyFocusTime = () => {
+    const weekData: { [key: string]: number } = {};
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    days.forEach((day) => (weekData[day] = 0));
+
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    completions.forEach((c: Completion) => {
+      const date = new Date(c.date);
+      if (date >= oneWeekAgo) {
+        const dayName = days[date.getDay()];
+        weekData[dayName] += c.duration;
+      }
+    });
+
+    return Object.entries(weekData).map(([day, minutes]) => ({ day, minutes }));
+  };
+
   const weeklyData = getWeeklyData();
   const maxCount = Math.max(...weeklyData.map((d) => d.count), 1);
+
+  const weeklyFocusTime = getWeeklyFocusTime();
+  const maxFocusTime = Math.max(...weeklyFocusTime.map((d) => d.minutes), 1);
 
   return (
     <div className="min-h-screen p-6" style={{ backgroundColor: "#F7F4EE" }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
-          className="mb-8"
+          className="mb-8 flex justify-between items-end"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="mb-2" style={{ color: "#333333" }}>
-            Bảng điều khiển phụ huynh
-          </h1>
-          <p style={{ color: "#666666" }}>
-            Theo dõi sự tập trung và tiến độ học tập của con
-          </p>
+          <div>
+            <h1 className="mb-2" style={{ color: "#333333" }}>
+              {selectedChild ? `Bảng điều khiển của ${selectedChild.firstName}` : "Bảng điều khiển phụ huynh"}
+            </h1>
+            <p style={{ color: "#666666" }}>
+              {selectedChild 
+                ? "Xem chi tiết hoạt động của bé" 
+                : "Theo dõi sự tập trung và tiến độ học tập của con"}
+            </p>
+          </div>
+          {selectedChild && (
+            <button 
+              onClick={() => setSelectedChild(null)}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Quay lại tổng quan
+            </button>
+          )}
         </motion.div>
 
         {/* Stats */}
@@ -324,6 +388,47 @@ export function ParentDashboard() {
           </motion.div>
         </div>
 
+        {/* Focus Time Chart */}
+        <motion.div
+          className="mt-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65 }}
+        >
+          <Card className="p-6 rounded-2xl border-0" style={{ backgroundColor: "white" }}>
+            <div className="flex items-center gap-3 mb-6">
+              <Clock className="w-6 h-6" style={{ color: "#4ADE80" }} />
+              <h2 style={{ color: "#333333" }}>Thời gian tập trung tuần này (phút)</h2>
+            </div>
+
+            <div className="space-y-4">
+              {weeklyFocusTime.map((data, index) => (
+                <div key={data.day}>
+                  <div className="flex justify-between mb-1">
+                    <span style={{ color: "#666666" }}>{data.day}</span>
+                    <span style={{ color: "#333333" }}>{data.minutes} phút</span>
+                  </div>
+                  <motion.div
+                    className="h-8 rounded-full"
+                    style={{ backgroundColor: "#E8F5FF" }}
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                  >
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: "#4ADE80" }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(data.minutes / maxFocusTime) * 100}%` }}
+                      transition={{ delay: 0.7 + index * 0.1, duration: 0.5 }}
+                    />
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </motion.div>
+
         {/* Insights */}
         <motion.div
           className="mt-6"
@@ -372,7 +477,7 @@ export function ParentDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <ChildManagement />
+          <ChildManagement onSelectChild={setSelectedChild} />
         </motion.div>
       </div>
     </div>

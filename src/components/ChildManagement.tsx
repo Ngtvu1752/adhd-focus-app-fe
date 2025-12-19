@@ -1,5 +1,5 @@
 // src/components/ChildManagement.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useRef} from 'react';
 import { Plus, User, Save, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -25,7 +25,11 @@ interface ChildAccount {
   lastName: string; // Thêm lastName
 }
 
-export function ChildManagement() {
+interface ChildManagementProps {
+  onSelectChild?: (child: ChildAccount) => void;
+}
+
+export function ChildManagement({ onSelectChild }: ChildManagementProps) {
   const [children, setChildren] = useState<ChildAccount[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,6 +39,8 @@ export function ChildManagement() {
   const [lastName, setLastName] = useState(''); // Thêm state cho Họ
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
 
   useEffect(() => {
     loadChildren();
@@ -46,16 +52,34 @@ export function ChildManagement() {
       const res: any = await authApi.getChildren();
       // Backend có thể trả về res.data hoặc res trực tiếp tùy cấu hình axios
       // Giả sử res là mảng các con
-      if (Array.isArray(res)) {
+      if (Array.isArray(res) && res.length > 0) {
         setChildren(res);
-      } else if (res.data && Array.isArray(res.data)) {
+      } else if (res.data && Array.isArray(res.data) && res.data.length > 0) {
          setChildren(res.data);
+      } else {
+        // Fallback mock data nếu không có dữ liệu từ API
+        setChildren([
+          { id: 'child1', username: 'bi_beo', firstName: 'Bi', lastName: 'Nguyễn' },
+          { id: 'child2', username: 'bong_xinh', firstName: 'Bống', lastName: 'Trần' }
+        ]);
       }
     } catch (error) {
       console.error("Failed to load children", error);
-      // toast.error("Không tải được danh sách con");
+      // Fallback mock data khi lỗi
+      setChildren([
+        { id: 'child1', username: 'bi_beo', firstName: 'Bi', lastName: 'Nguyễn' },
+        { id: 'child2', username: 'bong_xinh', firstName: 'Bống', lastName: 'Trần' }
+      ]);
     }
   };
+  const returnHeadPage = () => {
+    const mainContainer = document.querySelector('main');
+    if (mainContainer) {
+      mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 
   const handleCreateChild = async () => {
     if (!firstName || !lastName || !username || !password) {
@@ -168,12 +192,12 @@ export function ChildManagement() {
       </div>
 
       {/* Danh sách hiển thị */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4" ref={scrollContainerRef}>
         {children.length === 0 ? (
           <p className="text-gray-500 text-sm italic">Chưa có tài khoản nào.</p>
         ) : (
           children.map((child, index) => (
-            <Card key={child.id || index} className="p-4 flex items-center justify-between bg-white border-l-4 border-l-[#FFD966]">
+            <Card key={child.id || index} className="p-4 flex items-center justify-between bg-white border-l-4 border-l-[#FFD966] " ref={scrollContainerRef}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#E8F5FF] flex items-center justify-center">
                   <User className="w-6 h-6 text-[#333333]" />
@@ -184,7 +208,12 @@ export function ChildManagement() {
                   <p className="text-xs text-gray-500">@{child.username}</p>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" className="text-xs text-blue-600">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs text-blue-600"
+                onClick={() => { if(onSelectChild) onSelectChild(child); returnHeadPage(); }}
+              >
                 Chi tiết
               </Button>
             </Card>
