@@ -168,10 +168,10 @@ export function ParentDashboard() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="mb-2" style={{ color: "#333333" }}>
-            Parent Dashboard
+            Bảng điều khiển phụ huynh
           </h1>
           <p style={{ color: "#666666" }}>
-            Track your child's focus and learning progress
+            Theo dõi sự tập trung và tiến độ học tập của con
           </p>
         </motion.div>
 
@@ -179,32 +179,32 @@ export function ParentDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             {
-              label: "Total Sessions",
+              label: "Tổng số phiên",
               icon: Award,
               value: stats.totalSessions,
               bg: "#E8F5FF",
-              suffix: "sessions",
+              suffix: "phiên",
             },
             {
-              label: "Total Time",
+              label: "Tổng thời gian",
               icon: Clock,
               value: stats.totalMinutes,
               bg: "#DFF7E8",
-              suffix: "min",
+              suffix: "phút",
             },
             {
-              label: "This Week",
+              label: "Tuần này",
               icon: TrendingUp,
               value: stats.thisWeek,
               bg: "#FFD966",
-              suffix: "sessions",
+              suffix: "phiên",
             },
             {
-              label: "Day Streak",
+              label: "Chuỗi ngày",
               icon: Calendar,
               value: stats.streak,
               bg: "white",
-              suffix: "days 🔥",
+              suffix: "ngày 🔥",
             },
           ].map((item, idx) => (
             <motion.div
@@ -238,7 +238,7 @@ export function ParentDashboard() {
             <Card className="p-6 rounded-2xl border-0" style={{ backgroundColor: "white" }}>
               <div className="flex items-center gap-3 mb-6">
                 <BarChart3 className="w-6 h-6" style={{ color: "#FFD966" }} />
-                <h2 style={{ color: "#333333" }}>Weekly Activity</h2>
+                <h2 style={{ color: "#333333" }}>Hoạt động tuần</h2>
               </div>
 
               <div className="space-y-4">
@@ -278,7 +278,7 @@ export function ParentDashboard() {
             <Card className="p-6 rounded-2xl border-0" style={{ backgroundColor: "white" }}>
               <div className="flex items-center gap-3 mb-6">
                 <CheckCircle2 className="w-6 h-6" style={{ color: "#DFF7E8" }} />
-                <h2 style={{ color: "#333333" }}>Recent Sessions</h2>
+                <h2 style={{ color: "#333333" }}>Các phiên gần đây</h2>
               </div>
 
               {completions.length === 0 ? (
@@ -333,12 +333,12 @@ export function ParentDashboard() {
         >
           <Card className="p-6 rounded-2xl border-0" style={{ backgroundColor: "#E8F5FF" }}>
             <h2 className="mb-4" style={{ color: "#333333" }}>
-              Performance Insights
+              Thông tin chi tiết
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <p className="mb-2" style={{ color: "#666666" }}>
-                  Average Daily Sessions
+                  Trung bình phiên mỗi ngày
                 </p>
                 <p className="text-3xl" style={{ color: "#333333" }}>
                   {stats.avgPerDay}

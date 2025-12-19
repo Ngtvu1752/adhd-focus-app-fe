@@ -59,9 +59,9 @@ export default function MainFocusApp() {
   };
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
+    if (hour < 12) return "Chào buổi sáng";
+    if (hour < 18) return "Chào buổi chiều";
+    return "Chào buổi tối";
   };
 
   const renderPage = () => {
@@ -149,7 +149,7 @@ export default function MainFocusApp() {
                     />
                   </motion.div>
                   <h2 className="font-semibold text-base" style={{ color: '#333333' }}>
-                    FocusBuddy
+                    FocusHero
                   </h2>
                 </Button>
 
@@ -164,7 +164,7 @@ export default function MainFocusApp() {
                   : "bg-blue-50 text-blue-700 border-blue-200"
                 }`}
               >
-                {user?.role === 'parent' ? 'Parent' : 'Child'}
+                {user?.role === 'parent' ? 'Phụ huynh' : 'Bé'}
               </Badge>
             </div>
             
@@ -328,7 +328,7 @@ export default function MainFocusApp() {
                 <span className={`text-xs font-medium ${
                   currentPage === 'parent-dashboard' ? 'font-semibold' : 'font-normal'
                 }`}>
-                  Dashboard
+                  Bảng tin
                 </span>
               </button>
 
@@ -354,7 +354,7 @@ export default function MainFocusApp() {
                 <span className={`text-xs font-medium ${
                   currentPage === 'settings' ? 'font-semibold' : 'font-normal'
                 }`}>
-                  Tasks
+                  Nhiệm vụ
                 </span>
               </button>
               

@@ -524,18 +524,18 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                     <Trophy className="w-8 h-8" style={{ color: '#FFD966' }} />
                   </div>
                   <div>
-                    <p className="text-sm" style={{ color: '#333333' }}>Level</p>
+                    <p className="text-sm" style={{ color: '#333333' }}>Cấp độ</p>
                     <p className="text-3xl" style={{ color: '#333333' }}>{userProgress.level}</p>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm" style={{ color: '#333333' }}>
-                    <span>Progress to Level {userProgress.level + 1}</span>
+                    <span>Tiến độ tới Cấp {userProgress.level + 1}</span>
                     <span>{userProgress.currentLevelPoints}/100</span>
                   </div>
                   <Progress value={userProgress.currentLevelPoints} className="h-3" />
                   <p className="text-sm text-center" style={{ color: '#333333' }}>
-                    {userProgress.pointsToNextLevel} points to next level!
+                    {userProgress.pointsToNextLevel} điểm nữa để lên cấp!
                   </p>
                 </div>
               </Card>
@@ -544,7 +544,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Star className="w-5 h-5" style={{ color: '#FFD966', fill: '#FFD966' }} />
-                    <h3 style={{ color: '#333333' }}>Total Points</h3>
+                    <h3 style={{ color: '#333333' }}>Tổng điểm</h3>
                   </div>
                   <p className="text-2xl" style={{ color: '#333333' }}>{userProgress.totalPoints}</p>
                 </div>
@@ -554,7 +554,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                 <Card className="p-3 rounded-xl border-0" style={{ backgroundColor: '#DFF7E8' }}>
                   <div className="flex flex-col items-center text-center">
                     <Zap className="w-5 h-5 mb-1" style={{ color: '#333333' }} />
-                    <span className="text-xs text-gray-600">Sessions</span>
+                    <span className="text-xs text-gray-600">Phiên</span>
                     <p className="text-lg font-bold" style={{ color: '#333333' }}>{userProgress.totalSessions}</p>
                   </div>
                 </Card>
@@ -562,7 +562,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                 <Card className="p-3 rounded-xl border-0" style={{ backgroundColor: '#F7F4EE' }}>
                   <div className="flex flex-col items-center text-center">
                     <span className="text-lg mb-1">🔥</span>
-                    <span className="text-xs text-gray-600">Streak</span>
+                    <span className="text-xs text-gray-600">Chuỗi ngày</span>
                     <p className="text-lg font-bold" style={{ color: '#333333' }}>{userProgress.streak}</p>
                   </div>
                 </Card>
@@ -589,8 +589,8 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                         <Gift className="w-6 h-6" style={{ color: '#FFD966' }} />
                       </div>
                       <div className="text-left">
-                        <p style={{ color: '#333333' }}>Rewards Shop</p>
-                        <p className="text-xs" style={{ color: '#666666' }}>Spend your points!</p>
+                        <p style={{ color: '#333333' }}>Cửa hàng đổi quà</p>
+                        <p className="text-xs" style={{ color: '#666666' }}>Đổi điểm lấy quà!</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5" style={{ color: '#333333' }} />
@@ -599,20 +599,20 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
               </motion.div>
 
               <Card className="p-4 rounded-xl border-0" style={{ backgroundColor: 'white', border: '2px dashed #FFD966' }}>
-                <h3 className="mb-2 text-sm font-medium" style={{ color: '#333333' }}>Next Rewards</h3>
+                <h3 className="mb-2 text-sm font-medium" style={{ color: '#333333' }}>Quà tiếp theo</h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Award className="w-5 h-5" style={{ color: '#FFD966' }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate" style={{ color: '#333333' }}>Focus Master</p>
-                      <p className="text-[10px] text-gray-500 truncate">Complete 10 sessions</p>
+                      <p className="text-xs font-medium truncate" style={{ color: '#333333' }}>Bậc thầy tập trung</p>
+                      <p className="text-xs text-gray-500 truncate">Hoàn thành 10 phiên</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Award className="w-5 h-5" style={{ color: '#DFF7E8' }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate" style={{ color: '#333333' }}>Time Champion</p>
-                      <p className="text-[10px] text-gray-500 truncate">Reach Level 5</p>
+                      <p className="text-xs font-medium truncate" style={{ color: '#333333' }}>Nhà vô địch thời gian</p>
+                      <p className="text-xs text-gray-500 truncate">Đạt cấp 5</p>
                     </div>
                   </div>
                 </div>
@@ -647,7 +647,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                 className="rounded-full bg-white/50 border-0 hover:bg-white"
               >
                 {focusMode ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
-                {focusMode ? 'Menu' : 'Focus'}
+                {focusMode ? 'Menu' : 'Tập trung'}
               </Button>
             </div>
 
@@ -659,7 +659,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
               >
                 {!currentTask && mode === 'focus' && (
                   <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
-                    <p className="text-lg text-gray-500 font-medium">👇 Select a task below to get started!</p>
+                    <p className="text-lg text-gray-500 font-medium">👇 Chọn một nhiệm vụ bên dưới để bắt đầu nhé!</p>
                   </div>
                 )}
                 
@@ -672,7 +672,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                     </motion.div>
                   ) : (
                     <Badge className="mb-4 px-4 py-1.5 text-sm border-0 font-medium" style={{ backgroundColor: theme.secondary, color: theme.text }}>
-                      {mode === 'focus' ? '✨ Sẵn sàng?' : (mode === 'short' ? '☕ Short Break' : '🛋️ Long Break')}
+                      {mode === 'focus' ? '✨ Sẵn sàng?' : (mode === 'short' ? '☕ Nghỉ ngắn' : '🛋️ Nghỉ dài')}
                     </Badge>
                   )}
                   
@@ -724,7 +724,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                     className={`rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all text-white ${focusMode ? 'px-10 h-16 text-xl' : 'h-14 px-8 text-lg'}`}
                     style={{ backgroundColor: theme.primary }} // 9. Màu nút theo theme
                   >
-                    {isActive ? <><Pause className="mr-2"/> Pause</> : <><Play className="mr-2"/> {timeLeft < sessionDuration ? 'Continue' : 'Start'}</>}
+                    {isActive ? <><Pause className="mr-2"/> Tạm dừng</> : <><Play className="mr-2"/> {timeLeft < sessionDuration ? 'Tiếp tục' : 'Bắt đầu'}</>}
                   </Button>
                   
                   {(currentTask || mode !== 'focus') && (
@@ -757,7 +757,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                       size="lg"
                       className={`rounded-full bg-green-500 text-white hover:bg-green-600 shadow-lg hover:scale-105 transition-all ${focusMode ? 'px-10 h-16 text-xl' : 'px-8 h-14 text-lg'}`}
                     >
-                      <CheckCircle className={`mr-2 ${focusMode ? 'w-6 h-6' : 'w-5 h-5'}`} /> Done
+                      <CheckCircle className={`mr-2 ${focusMode ? 'w-6 h-6' : 'w-5 h-5'}`} /> Xong
                     </Button>
                   )}
 
@@ -771,11 +771,11 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
                   <div className="flex items-center gap-2 mb-4">
                     <BookOpen className="w-6 h-6" style={{ color: theme.primary }} />
-                    <h2 className="text-xl font-bold" style={{ color: theme.text }}>Task List</h2>
+                    <h2 className="text-xl font-bold" style={{ color: theme.text }}>Danh sách nhiệm vụ</h2>
                   </div>
 
                   {tasks.length === 0 ? (
-                    <div className="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-gray-100"><p className="text-gray-400">No tasks for today. Awesome! 🎉</p></div>
+                    <div className="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-gray-100"><p className="text-gray-400">Hôm nay không có bài tập nào. Tuyệt vời! 🎉</p></div>
                   ) : (
                     <div className="space-y-3">
                       {tasks.map((task) => {
@@ -801,7 +801,7 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
                               </div>
                               <div className="flex items-center">
                                 {task.status === TaskStatus.COMPLETED ? <CheckCircle className="w-8 h-8 text-green-500 opacity-50" /> : 
-                                  <Button size="sm" onClick={() => selectTaskToFocus(task)} className="rounded-full bg-white text-[#333333] border hover:bg-gray-50">{isSelected && isActive ? 'Doing...' : style.btn}</Button>
+                                  <Button size="sm" onClick={() => selectTaskToFocus(task)} className="rounded-full bg-white text-[#333333] border hover:bg-gray-50">{isSelected && isActive ? 'Đang làm...' : style.btn}</Button>
                                 }
                               </div>
                             </div>
@@ -840,9 +840,9 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
           <motion.div className="fixed inset-0 flex items-center justify-center z-50 bg-black/60" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <motion.div className="bg-gradient-to-br from-yellow-100 via-green-100 to-blue-100 rounded-3xl p-12 text-center max-w-lg mx-4 relative overflow-hidden shadow-2xl" initial={{ scale: 0.5, y: 50 }} animate={{ scale: 1, y: 0 }}>
               <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }} transition={{ repeat: Infinity, duration: 2 }} className="mb-6 relative z-10"><PartyPopper className="w-32 h-32 mx-auto text-[#FFD966] fill-[#FFD966]" /></motion.div>
-              <h2 className="text-4xl font-bold text-[#333333] mb-4 relative z-10">Awesome! 🌟</h2>
-              <p className="text-xl text-gray-700 mb-8 relative z-10">You have completed the task!</p>
-              <Badge className="bg-[#FFD966] text-[#333333] text-2xl px-8 py-3 font-bold shadow-lg">+100 Points</Badge>
+              <h2 className="text-4xl font-bold text-[#333333] mb-4 relative z-10">Tuyệt vời! 🌟</h2>
+              <p className="text-xl text-gray-700 mb-8 relative z-10">Con đã hoàn thành nhiệm vụ!</p>
+              <Badge className="bg-[#FFD966] text-[#333333] text-2xl px-8 py-3 font-bold shadow-lg">+100 Điểm</Badge>
             </motion.div>
           </motion.div>
         )}
@@ -854,9 +854,9 @@ export function MainChildInterface({onNavigate}: MainChildInterfaceProps) {
             <motion.div className="bg-white rounded-3xl p-8 text-center max-w-sm mx-4 relative overflow-hidden" initial={{ scale: 0.5 }} animate={{ scale: 1 }}>
               <div className="absolute inset-0 bg-[#FFD966]/10" />
               <motion.div animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="mb-4 relative z-10"><Sparkles className="w-20 h-20 mx-auto text-[#FFD966] fill-[#FFD966]" /></motion.div>
-              <h2 className="text-2xl font-bold text-[#333333] mb-2 relative z-10">Excellent! 🎉</h2>
+              <h2 className="text-2xl font-bold text-[#333333] mb-2 relative z-10">Xuất sắc! 🎉</h2>
               <p className="text-gray-600 mb-6 relative z-10">Phiên tập trung hoàn tất.</p>
-              <Badge className="bg-[#FFD966] text-[#333333] text-lg px-4 py-1">+50 Points</Badge>
+              <Badge className="bg-[#FFD966] text-[#333333] text-lg px-4 py-1">+50 Điểm</Badge>
               <p className="text-xs text-gray-400 mt-4 italic animate-pulse">(Bấm phím bất kỳ để tiếp tục)</p>
             </motion.div>
           </motion.div>

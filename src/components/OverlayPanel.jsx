@@ -7,31 +7,31 @@ const OverlayPanel = ({ isRightPanelActive, onSignUpClick, onSignInClick }) => {
       <div className={`bg-secondary text-text-primary relative -left-full h-full w-[200%] transition-transform duration-[600ms] ease-custom-bezier ${isRightPanelActive ? 'translate-x-1/2' : 'translate-x-0'}`}>
         {/* Left Panel - Chào mừng trở lại */}
         <div className={`absolute top-0 flex flex-col justify-center items-center px-10 h-full w-1/2 text-center transition-transform duration-[600ms] ease-custom-bezier ${isRightPanelActive ? 'translate-x-0' : '-translate-x-[20%]'}`}>
-          <h2 className="text-[26px] mb-5">Hello there!</h2>
+          <h2 className="text-[26px] mb-5">Chào mừng bạn quay lại!</h2>
           <p className="text-[15px] leading-relaxed my-5">
-            Start your journey with us by creating a new account
+             Để tiếp tục bài học và gặp lại những người bạn thú vị, hãy đăng nhập nhé!
           </p>
           {/* Cập nhật nút */}
           <button 
             onClick={onSignInClick}
             className="rounded-[25px] border-2 border-text-primary bg-transparent text-text-primary text-sm font-semibold py-3.5 px-12 tracking-wider uppercase transition-all duration-300 cursor-pointer shadow-none hover:bg-text-primary/10"
           >
-            Log in
+            Đăng nhập
           </button>
         </div>
 
         {/* Right Panel - Xin chào bạn */}
         <div className={`absolute top-0 right-0 flex flex-col justify-center items-center px-10 h-full w-1/2 text-center transition-transform duration-[600ms] ease-custom-bezier ${isRightPanelActive ? 'translate-x-[20%]' : 'translate-x-0'}`}>
-          <h2 className="text-[26px] mb-5">Welcome Back!</h2>
+          <h2 className="text-[26px] mb-5">Xin chào bạn mới!</h2>
           <p className="text-[15px] leading-relaxed my-5">
-            Log in to continue connecting and exploring exciting things
+            Hãy tham gia cùng chúng tớ để khám phá thật nhiều điều hay và bổ ích!
           </p>
           {/* Cập nhật nút */}
           <button 
             onClick={onSignUpClick}
             className="rounded-[25px] border-2 border-text-primary bg-transparent text-text-primary text-sm font-semibold py-3.5 px-12 tracking-wider uppercase transition-all duration-300 cursor-pointer shadow-none hover:bg-text-primary/10"
           >
-            Sign Up
+            Đăng ký ngay
           </button>
         </div>
       </div>

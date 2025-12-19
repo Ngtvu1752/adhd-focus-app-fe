@@ -5,7 +5,7 @@ import OverlayPanel from './OverlayPanel';
 
 const LoginPage = () => {
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
-  const [isParent, setIsParent] = useState(true);
+  const [isParent, setIsParent] = useState(false);
   const handleSignUpClick = () => {
     setIsRightPanelActive(true);
   };

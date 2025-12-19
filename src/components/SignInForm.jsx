@@ -19,7 +19,7 @@ const SignInForm = ({ isParent, setIsParent }) => {
       await login(username, password, isParent);
       navigate('/app');
     } catch (err) {
-      setError('Login failed. Please try again.');
+      setError('Đăng nhập thất bại. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -63,8 +63,8 @@ const SignInForm = ({ isParent, setIsParent }) => {
           onChange={(e) => setUsername(e.target.value)}
           className="w-full py-4 px-5 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 bg-neutral-light focus:outline-none focus:border-accent focus:bg-white focus:-translate-y-0.5 focus:shadow-[0_5px_15px_rgba(255,217,102,0.2)] peer"
         />
-        <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
-          Username
+        <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-transparent px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
+          Tên đăng nhập
         </label>
       </div>
       
@@ -77,7 +77,7 @@ const SignInForm = ({ isParent, setIsParent }) => {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full py-4 px-5 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 bg-neutral-light focus:outline-none focus:border-overlay-start focus:bg-white focus:-translate-y-0.5 focus:shadow-[0_5px_15px_rgba(74,144,226,0.2)] peer"
         />
-        <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
+        <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-transparent px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
           Mật khẩu
         </label>
       </div>

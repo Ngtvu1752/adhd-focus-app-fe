@@ -59,7 +59,7 @@ export function ChildManagement() {
 
   const handleCreateChild = async () => {
     if (!firstName || !lastName || !username || !password) {
-      toast.error("Please fill in all the information!");
+      toast.error("Vui lòng điền đầy đủ thông tin!");
       return;
     }
 
@@ -73,7 +73,7 @@ export function ChildManagement() {
         password
       });
 
-      toast.success(`Successfully created account for ${firstName} ${lastName}! 🎉`);
+      toast.success(`Đã tạo thành công tài khoản cho ${firstName} ${lastName}! 🎉`);
       
       // 2. Reset form
       setFirstName('');
@@ -96,7 +96,7 @@ export function ChildManagement() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-[#333333]">Child Account List</h3>
+        <h3 className="text-lg font-semibold text-[#333333]">Danh sách tài khoản của con</h3>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -108,14 +108,14 @@ export function ChildManagement() {
           
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Create Child Account</DialogTitle>
+              <DialogTitle>Tạo tài khoản cho con</DialogTitle>
             </DialogHeader>
             
             <div className="grid gap-4 py-4">
               {/* Hàng: Họ và Tên */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">Họ</Label>
                   <Input 
                     id="lastName" 
                     placeholder="Nguyễn" 
@@ -124,7 +124,7 @@ export function ChildManagement() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">Tên</Label>
                   <Input 
                     id="firstName" 
                     placeholder="Văn An" 
@@ -135,7 +135,7 @@ export function ChildManagement() {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">Tên đăng nhập</Label>
                 <Input 
                   id="username" 
                   placeholder="child_account" 
@@ -144,7 +144,7 @@ export function ChildManagement() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Mật khẩu</Label>
                 <Input 
                   id="password" 
                   type="password"
@@ -157,10 +157,10 @@ export function ChildManagement() {
 
             <DialogFooter>
                <DialogClose asChild>
-                  <Button type="button" variant="ghost">Cancel</Button>
+                  <Button type="button" variant="ghost">Hủy</Button>
                </DialogClose>
               <Button onClick={handleCreateChild} disabled={loading} className="bg-[#FFD966] text-[#333333]">
-                {loading ? 'Creating...' : 'Save Account'}
+                {loading ? 'Đang tạo...' : 'Lưu tài khoản'}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -170,7 +170,7 @@ export function ChildManagement() {
       {/* Danh sách hiển thị */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {children.length === 0 ? (
-          <p className="text-gray-500 text-sm italic">No child accounts available.</p>
+          <p className="text-gray-500 text-sm italic">Chưa có tài khoản nào.</p>
         ) : (
           children.map((child, index) => (
             <Card key={child.id || index} className="p-4 flex items-center justify-between bg-white border-l-4 border-l-[#FFD966]">

@@ -38,7 +38,7 @@ export function KidProfileSettings() {
     localStorage.setItem('kidProfile', JSON.stringify(profile));
     window.dispatchEvent(new Event('kidProfileUpdated'));
     setShowSaveAnimation(true);
-    toast.success('Profile saved! 🎉');
+    toast.success('Đã lưu hồ sơ! 🎉');
     
     setTimeout(() => {
       setShowSaveAnimation(false);
@@ -66,10 +66,10 @@ export function KidProfileSettings() {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <Sparkles className="w-8 h-8" style={{ color: selectedTheme.secondary }} />
-            <h1 style={{ color: '#333333' }}>My Profile</h1>
+            <h1 style={{ color: '#333333' }}>Hồ sơ của mình</h1>
             <Sparkles className="w-8 h-8" style={{ color: selectedTheme.secondary }} />
           </div>
-          <p style={{ color: '#666666' }}>Make it yours! Customize your FocusBuddy experience</p>
+          <p style={{ color: '#666666' }}>Tạo dấu ấn riêng! Tùy chỉnh FocusHero theo ý thích nhé</p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -85,16 +85,16 @@ export function KidProfileSettings() {
             >
               <div className="flex items-center gap-2 mb-4">
                 <Star className="w-6 h-6" style={{ color: '#FFD966', fill: '#FFD966' }} />
-                <h3 style={{ color: '#333333' }}>Your Name</h3>
+                <h3 style={{ color: '#333333' }}>Tên của bạn</h3>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="name" style={{ color: '#666666' }}>
-                  What should we call you?
+                  Mình nên gọi bạn là gì nhỉ?
                 </Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Enter your name..."
+                  placeholder="Nhập tên của bạn..."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="h-12 text-lg rounded-2xl"
@@ -113,7 +113,7 @@ export function KidProfileSettings() {
             >
               <div className="flex items-center gap-2 mb-4">
                 <Trophy className="w-6 h-6" style={{ color: '#FFD966' }} />
-                <h3 style={{ color: '#333333' }}>Choose Your Avatar</h3>
+                <h3 style={{ color: '#333333' }}>Chọn hình đại diện</h3>
               </div>
               <div className="grid grid-cols-4 gap-3">
                 {AVATAR_OPTIONS.map((avatar) => (
@@ -157,7 +157,7 @@ export function KidProfileSettings() {
             >
               <div className="flex items-center gap-2 mb-4">
                 <Palette className="w-6 h-6" style={{ color: '#FFD966' }} />
-                <h3 style={{ color: '#333333' }}>Pick Your Theme</h3>
+                <h3 style={{ color: '#333333' }}>Chọn màu yêu thích</h3>
               </div>
               <div className="space-y-3">
                 {THEME_COLORS.map((theme) => (
@@ -204,9 +204,9 @@ export function KidProfileSettings() {
                     <VolumeX className="w-6 h-6" style={{ color: '#999' }} />
                   )}
                   <div>
-                    <h3 style={{ color: '#333333' }}>Sound Effects</h3>
+                    <h3 style={{ color: '#333333' }}>Hiệu ứng âm thanh</h3>
                     <p className="text-sm" style={{ color: '#666666' }}>
-                      {soundEnabled ? 'Sounds are on' : 'Sounds are off'}
+                      {soundEnabled ? 'Đang bật âm thanh' : 'Đang tắt âm thanh'}
                     </p>
                   </div>
                 </div>
@@ -228,7 +228,7 @@ export function KidProfileSettings() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <h3 className="mb-6" style={{ color: '#333333' }}>Profile Preview</h3>
+              <h3 className="mb-6" style={{ color: '#333333' }}>Xem trước hồ sơ</h3>
               
               <motion.div
                 className="w-32 h-32 mx-auto rounded-full flex items-center justify-center text-6xl mb-4 shadow-lg"
@@ -245,7 +245,7 @@ export function KidProfileSettings() {
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                {name || 'Your Name'}
+                {name || 'Tên của bạn'}
               </motion.h2>
 
               <div className="mb-6">
@@ -257,7 +257,7 @@ export function KidProfileSettings() {
                 style={{ backgroundColor: selectedTheme.primary }}
               >
                 <p style={{ color: selectedTheme.secondary }}>
-                  Your FocusBuddy is ready! 🎉
+                  FocusHero đã sẵn sàng! 🎉
                 </p>
               </div>
             </motion.div>
@@ -270,7 +270,7 @@ export function KidProfileSettings() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <h3 className="mb-4" style={{ color: '#333333' }}>Your Achievements</h3>
+              <h3 className="mb-4" style={{ color: '#333333' }}>Thành tích của bạn</h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <motion.div
@@ -282,7 +282,7 @@ export function KidProfileSettings() {
                   <div className="text-2xl mb-1" style={{ color: '#333333' }}>
                     {stats.totalStars}
                   </div>
-                  <div className="text-sm" style={{ color: '#666666' }}>Total Stars</div>
+                  <div className="text-sm" style={{ color: '#666666' }}>Tổng số sao</div>
                 </motion.div>
 
                 <motion.div
@@ -292,9 +292,9 @@ export function KidProfileSettings() {
                 >
                   <div className="text-3xl mb-2">🏆</div>
                   <div className="text-2xl mb-1" style={{ color: '#333333' }}>
-                    Level {stats.level}
+                    Cấp {stats.level}
                   </div>
-                  <div className="text-sm" style={{ color: '#666666' }}>Current Level</div>
+                  <div className="text-sm" style={{ color: '#666666' }}>Cấp độ hiện tại</div>
                 </motion.div>
 
                 <motion.div
@@ -306,7 +306,7 @@ export function KidProfileSettings() {
                   <div className="text-2xl mb-1" style={{ color: '#333333' }}>
                     {stats.tasksCompleted}
                   </div>
-                  <div className="text-sm" style={{ color: '#666666' }}>Tasks Done</div>
+                  <div className="text-sm" style={{ color: '#666666' }}>Nhiệm vụ đã xong</div>
                 </motion.div>
 
                 <motion.div
@@ -318,7 +318,7 @@ export function KidProfileSettings() {
                   <div className="text-2xl mb-1" style={{ color: '#333333' }}>
                     {stats.streak}
                   </div>
-                  <div className="text-sm" style={{ color: '#666666' }}>Day Streak</div>
+                  <div className="text-sm" style={{ color: '#666666' }}>Chuỗi ngày</div>
                 </motion.div>
               </div>
             </motion.div>
@@ -339,7 +339,7 @@ export function KidProfileSettings() {
                 }}
               >
                 <Save className="w-6 h-6 mr-2" />
-                Save My Profile
+                Lưu hồ sơ
               </Button>
             </motion.div>
           </div>

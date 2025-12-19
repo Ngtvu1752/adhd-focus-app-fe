@@ -58,12 +58,12 @@ export function RewardsShop() {
     } else {
       // Fake Data: Rewards
       const fakeRewards: Reward[] = [
-        { id: '1', name: '30 Mins Screen Time', description: 'Watch TV or play games', pointsCost: 50, icon: '📺', active: true },
-        { id: '2', name: 'Ice Cream Treat', description: 'One scoop of favorite flavor', pointsCost: 100, icon: '🍦', active: true },
-        { id: '3', name: 'New Comic Book', description: 'Pick one from the store', pointsCost: 300, icon: '📚', active: true },
-        { id: '4', name: 'Pizza Night', description: 'Choose the toppings!', pointsCost: 500, icon: '🍕', active: true },
-        { id: '5', name: 'Park Visit', description: 'Go to the big playground', pointsCost: 150, icon: '🌳', active: true },
-        { id: '6', name: 'Stay Up Late', description: '30 extra minutes on weekend', pointsCost: 200, icon: '🌙', active: true },
+        { id: '1', name: '30 phút xem màn hình', description: 'Xem TV hoặc chơi game', pointsCost: 50, icon: '📺', active: true },
+        { id: '2', name: 'Một cây kem', description: 'Một viên kem vị yêu thích', pointsCost: 100, icon: '🍦', active: true },
+        { id: '3', name: 'Truyện tranh mới', description: 'Chọn một cuốn ở cửa hàng', pointsCost: 300, icon: '📚', active: true },
+        { id: '4', name: 'Tiệc Pizza', description: 'Chọn loại nhân con thích!', pointsCost: 500, icon: '🍕', active: true },
+        { id: '5', name: 'Đi công viên', description: 'Đi chơi ở sân chơi lớn', pointsCost: 150, icon: '🌳', active: true },
+        { id: '6', name: 'Thức khuya', description: 'Thêm 30 phút vào cuối tuần', pointsCost: 200, icon: '🌙', active: true },
       ];
       setRewards(fakeRewards);
       localStorage.setItem('rewards', JSON.stringify(fakeRewards));
@@ -132,7 +132,7 @@ export function RewardsShop() {
 
   const handleRedeemClick = (reward: Reward) => {
     if (!canAfford(reward.pointsCost)) {
-      toast.error(`You need ${reward.pointsCost - (userProgress?.totalPoints || 0)} more points! 💪`);
+      toast.error(`Con cần thêm ${reward.pointsCost - (userProgress?.totalPoints || 0)} điểm nữa! Cố lên! 💪`);
       return;
     }
     setSelectedReward(reward);
@@ -167,7 +167,7 @@ export function RewardsShop() {
     setShowConfirmDialog(false);
     setShowCelebration(true);
     
-    toast.success(`🎉 Request sent! Ask your parent to approve it!`);
+    toast.success(`🎉 Đã gửi yêu cầu! Hãy nhờ ba mẹ duyệt nhé!`);
 
     setTimeout(() => {
       setShowCelebration(false);
@@ -191,10 +191,10 @@ export function RewardsShop() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
               <h1 className="mb-2" style={{ color: '#333333' }}>
-                🎁 Rewards Shop
+                🎁 Cửa hàng đổi quà
               </h1>
               <p style={{ color: '#666666' }}>
-                Spend your points on awesome rewards!
+                Dùng điểm tích lũy để đổi những món quà tuyệt vời!
               </p>
             </div>
             
@@ -221,11 +221,11 @@ export function RewardsShop() {
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="shop">
               <ShoppingBag className="w-4 h-4 mr-2" />
-              Shop
+              Cửa hàng
             </TabsTrigger>
             <TabsTrigger value="history">
               <History className="w-4 h-4 mr-2" />
-              My Rewards
+              Quà của tôi
             </TabsTrigger>
           </TabsList>
 
@@ -239,10 +239,10 @@ export function RewardsShop() {
                 <Card className="p-12 rounded-2xl border-0 text-center" style={{ backgroundColor: 'white' }}>
                   <div className="mb-4 text-6xl">🎁</div>
                   <h2 className="mb-2" style={{ color: '#333333' }}>
-                    No Rewards Available Yet
+                    Chưa có quà nào
                   </h2>
                   <p style={{ color: '#666666' }}>
-                    Ask your parent to add some rewards you can earn!
+                    Hãy nhờ ba mẹ thêm quà để con phấn đấu nhé!
                   </p>
                 </Card>
               </motion.div>
@@ -318,7 +318,7 @@ export function RewardsShop() {
                             style={{ backgroundColor: '#E8F5FF', color: '#666666' }}
                           >
                             <Clock className="w-4 h-4 mr-2" />
-                            Pending Approval
+                            Chờ duyệt
                           </Button>
                         ) : (
                           <Button
@@ -336,12 +336,12 @@ export function RewardsShop() {
                             {affordable ? (
                               <>
                                 <Gift className="w-4 h-4 mr-2" />
-                                Get This Reward!
+                                Đổi quà này!
                               </>
                             ) : (
                               <>
                                 <Lock className="w-4 h-4 mr-2" />
-                                Need {reward.pointsCost - (userProgress?.totalPoints || 0)} More
+                                Cần thêm {reward.pointsCost - (userProgress?.totalPoints || 0)} điểm
                               </>
                             )}
                           </Button>
@@ -361,7 +361,7 @@ export function RewardsShop() {
               {myRequests.length > 0 && (
                 <div>
                   <h2 className="mb-4" style={{ color: '#333333' }}>
-                    ⏳ Waiting for Approval
+                    ⏳ Đang chờ duyệt
                   </h2>
                   <div className="space-y-3">
                     {myRequests.map((request, index) => (
@@ -380,7 +380,7 @@ export function RewardsShop() {
                                   {request.rewardName}
                                 </h3>
                                 <p className="text-sm" style={{ color: '#666666' }}>
-                                  Requested on {new Date(request.requestedAt).toLocaleDateString()}
+                                  Yêu cầu ngày {new Date(request.requestedAt).toLocaleDateString()}
                                 </p>
                               </div>
                             </div>
@@ -389,7 +389,7 @@ export function RewardsShop() {
                               style={{ backgroundColor: '#FFD966', color: '#333333' }}
                             >
                               <Clock className="w-3 h-3 mr-1" />
-                              Pending
+                              Chờ duyệt
                             </Badge>
                           </div>
                         </Card>
@@ -403,7 +403,7 @@ export function RewardsShop() {
               {approvedRewards.length > 0 && (
                 <div>
                   <h2 className="mb-4" style={{ color: '#333333' }}>
-                    ✅ Approved Rewards
+                    ✅ Quà đã được duyệt
                   </h2>
                   <div className="space-y-3">
                     {approvedRewards.map((request, index) => (
@@ -422,7 +422,7 @@ export function RewardsShop() {
                                   {request.rewardName}
                                 </h3>
                                 <p className="text-sm" style={{ color: '#666666' }}>
-                                  Approved on {request.approvedAt && new Date(request.approvedAt).toLocaleDateString()}
+                                  Duyệt ngày {request.approvedAt && new Date(request.approvedAt).toLocaleDateString()}
                                 </p>
                               </div>
                             </div>
@@ -431,7 +431,7 @@ export function RewardsShop() {
                               style={{ backgroundColor: '#333333', color: 'white' }}
                             >
                               <CheckCircle className="w-3 h-3 mr-1" />
-                              Approved
+                              Đã duyệt
                             </Badge>
                           </div>
                         </Card>
@@ -445,7 +445,7 @@ export function RewardsShop() {
               {rejectedRewards.length > 0 && (
                 <div>
                   <h2 className="mb-4" style={{ color: '#333333' }}>
-                    ❌ Not This Time
+                    ❌ Chưa được duyệt
                   </h2>
                   <div className="space-y-3">
                     {rejectedRewards.map((request, index) => (
@@ -464,7 +464,7 @@ export function RewardsShop() {
                                   {request.rewardName}
                                 </h3>
                                 <p className="text-sm" style={{ color: '#666666' }}>
-                                  Points were refunded
+                                  Điểm đã được hoàn lại
                                 </p>
                               </div>
                             </div>
@@ -473,7 +473,7 @@ export function RewardsShop() {
                               style={{ backgroundColor: '#FFE6E6', color: '#333333' }}
                             >
                               <XCircle className="w-3 h-3 mr-1" />
-                              Rejected
+                              Từ chối
                             </Badge>
                           </div>
                         </Card>
@@ -487,10 +487,10 @@ export function RewardsShop() {
                 <Card className="p-12 rounded-2xl border-0 text-center" style={{ backgroundColor: 'white' }}>
                   <div className="mb-4 text-6xl">🎯</div>
                   <h2 className="mb-2" style={{ color: '#333333' }}>
-                    No Rewards Yet
+                    Chưa có quà nào
                   </h2>
                   <p style={{ color: '#666666' }}>
-                    Complete tasks to earn points and redeem rewards!
+                    Hoàn thành nhiệm vụ để tích điểm đổi quà nhé!
                   </p>
                 </Card>
               )}
@@ -502,9 +502,9 @@ export function RewardsShop() {
         <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Confirm Reward Request</DialogTitle>
+              <DialogTitle>Xác nhận đổi quà</DialogTitle>
               <DialogDescription>
-                Are you sure you want to request this reward?
+                Con có chắc muốn đổi món quà này không?
               </DialogDescription>
             </DialogHeader>
 
@@ -526,27 +526,27 @@ export function RewardsShop() {
                   >
                     <Star className="w-5 h-5" style={{ color: '#333333' }} />
                     <span style={{ color: '#333333' }}>
-                      {selectedReward.pointsCost} points
+                      {selectedReward.pointsCost} điểm
                     </span>
                   </div>
                 </Card>
 
                 <div className="mt-6 p-4 rounded-xl" style={{ backgroundColor: '#E8F5FF' }}>
                   <div className="flex justify-between items-center mb-2">
-                    <span style={{ color: '#666666' }}>Current Points:</span>
+                    <span style={{ color: '#666666' }}>Điểm hiện tại:</span>
                     <span style={{ color: '#333333' }}>
                       {userProgress?.totalPoints || 0}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-2">
-                    <span style={{ color: '#666666' }}>Cost:</span>
+                    <span style={{ color: '#666666' }}>Chi phí:</span>
                     <span style={{ color: '#333333' }}>
                       -{selectedReward.pointsCost}
                     </span>
                   </div>
                   <div className="h-px my-3" style={{ backgroundColor: '#333333', opacity: 0.2 }} />
                   <div className="flex justify-between items-center">
-                    <span style={{ color: '#333333' }}>After Request:</span>
+                    <span style={{ color: '#333333' }}>Sau khi đổi:</span>
                     <span style={{ color: '#333333' }}>
                       {(userProgress?.totalPoints || 0) - selectedReward.pointsCost}
                     </span>
@@ -554,7 +554,7 @@ export function RewardsShop() {
                 </div>
 
                 <p className="text-sm text-center mt-4" style={{ color: '#666666' }}>
-                  Your parent will need to approve this request before you can enjoy your reward! 🎉
+                  Ba mẹ cần duyệt yêu cầu này trước khi con nhận quà nhé! 🎉
                 </p>
               </div>
             )}
@@ -567,7 +567,7 @@ export function RewardsShop() {
                   setSelectedReward(null);
                 }}
               >
-                Cancel
+                Hủy
               </Button>
               <Button
                 className="gap-2"
@@ -575,7 +575,7 @@ export function RewardsShop() {
                 onClick={handleConfirmRedeem}
               >
                 <Gift className="w-4 h-4" />
-                Request Reward!
+                Gửi yêu cầu!
               </Button>
             </DialogFooter>
           </DialogContent>

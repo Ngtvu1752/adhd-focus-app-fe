@@ -81,11 +81,11 @@ export function TaskSettings() {
 
   const addTask = async () => {
     if (!newTaskTitle.trim()) {
-      toast.error('Please enter a task title');
+      toast.error('Vui lòng nhập tiêu đề nhiệm vụ');
       return;
     }
     if (!assignChildId) {
-      toast.error('Please select a child to assign the task');
+      toast.error('Vui lòng chọn bé để giao nhiệm vụ');
       return;
     }
 
@@ -107,35 +107,35 @@ export function TaskSettings() {
       setNewTaskTitle('');
       setNewTaskDesc('');
       setNewTaskDueDate('');
-      toast.success('Task assigned successfully! 🎉');
+      toast.success('Giao nhiệm vụ thành công! 🎉');
 
     } catch (error) {
       console.error(error);
-      toast.error('Failed to assign task.');
+      toast.error('Giao nhiệm vụ thất bại.');
     } finally {
       setLoading(false);
     }
   };
 
   const deleteTask = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa nhiệm vụ này?")) return;
     try {
       await taskApi.delete(id);
       setTasks(tasks.filter(t => t.id !== id));
-      toast.success('Task deleted successfully');
+      toast.success('Xóa nhiệm vụ thành công');
     } catch (error) {
-      toast.error('Failed to delete task');
+      toast.error('Xóa nhiệm vụ thất bại');
     }
   };
 
   const getStatusBadge = (status: TaskStatus) => {
     switch (status) {
       case TaskStatus.COMPLETED:
-        return <Badge className="bg-green-100 text-green-700 border-green-200">Completed</Badge>;
+        return <Badge className="bg-green-100 text-green-700 border-green-200">Đã xong</Badge>;
       case TaskStatus.IN_PROGRESS:
-        return <Badge className="bg-blue-100 text-blue-700 border-blue-200">In Progress</Badge>;
+        return <Badge className="bg-blue-100 text-blue-700 border-blue-200">Đang làm</Badge>;
       default:
-        return <Badge variant="outline" className="text-gray-500">Not Started</Badge>;
+        return <Badge variant="outline" className="text-gray-500">Chưa làm</Badge>;
     }
   };
 
@@ -149,8 +149,8 @@ export function TaskSettings() {
     <div className="min-h-screen p-6" style={{ backgroundColor: '#F7F4EE' }}>
       <div className="max-w-4xl mx-auto">
         <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="mb-2 text-2xl font-bold text-[#333333]">Task Management</h1>
-          <p className="text-[#666666]">Assign tasks and track progress for your children</p>
+          <h1 className="mb-2 text-2xl font-bold text-[#333333]">Quản lý nhiệm vụ</h1>
+          <p className="text-[#666666]">Giao bài và theo dõi tiến độ của con</p>
         </motion.div>
 
         {/* --- FORM GIAO NHIỆM VỤ (PHẦN TRÊN) --- */}
@@ -158,16 +158,16 @@ export function TaskSettings() {
           <Card className="p-6 rounded-2xl border-0 mb-6 bg-white shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <Plus className="w-6 h-6 text-[#FFD966]" />
-              <h2 className="text-lg font-semibold text-[#333333]">Assign New Task</h2>
+              <h2 className="text-lg font-semibold text-[#333333]">Giao nhiệm vụ mới</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               {/* Chọn Child để giao bài */}
               <div className="col-span-1 md:col-span-2">
-                <Label className="text-[#333333]">Assign to Child <span className="text-red-500">*</span></Label>
+                <Label className="text-[#333333]">Giao cho con <span className="text-red-500">*</span></Label>
                 <Select value={assignChildId} onValueChange={setAssignChildId}>
                   <SelectTrigger className="mt-1 bg-[#F7F4EE] border-0 h-12">
-                    <SelectValue placeholder="Select a child account" />
+                    <SelectValue placeholder="Chọn tài khoản của con" />
                   </SelectTrigger>
                   <SelectContent>
                     {children.map((child) => (
@@ -181,29 +181,29 @@ export function TaskSettings() {
 
               {/* Các input khác giữ nguyên */}
               <div className="col-span-1 md:col-span-2">
-                <Label htmlFor="title" className="text-[#333333]">Title <span className="text-red-500">*</span></Label>
+                <Label htmlFor="title" className="text-[#333333]">Tiêu đề <span className="text-red-500">*</span></Label>
                 <Input
                   id="title"
                   value={newTaskTitle}
                   onChange={(e) => setNewTaskTitle(e.target.value)}
-                  placeholder="e.g., Complete Math Homework..."
+                  placeholder="Ví dụ: Làm bài tập Toán..."
                   className="mt-1 bg-[#F7F4EE] border-0"
                 />
               </div>
 
               <div className="col-span-1 md:col-span-2">
-                <Label htmlFor="desc" className="text-[#333333]">Description</Label>
+                <Label htmlFor="desc" className="text-[#333333]">Mô tả</Label>
                 <Textarea
                   id="desc"
                   value={newTaskDesc}
                   onChange={(e) => setNewTaskDesc(e.target.value)}
-                  placeholder="Details..."
+                  placeholder="Chi tiết..."
                   className="mt-1 bg-[#F7F4EE] border-0 resize-none h-20"
                 />
               </div>
 
               <div className="col-span-1">
-                <Label htmlFor="dueDate" className="text-[#333333]">Due Date</Label>
+                <Label htmlFor="dueDate" className="text-[#333333]">Hạn chót</Label>
                 <Input
                   id="dueDate"
                   type="datetime-local"
@@ -219,7 +219,7 @@ export function TaskSettings() {
               disabled={loading}
               className="w-full md:w-auto bg-[#FFD966] text-[#333333] hover:bg-[#ffcf40]"
             >
-              {loading ? 'Sending...' : 'Assign Task'}
+              {loading ? 'Đang gửi...' : 'Giao bài'}
             </Button>
           </Card>
         </motion.div>
@@ -231,7 +231,7 @@ export function TaskSettings() {
             {/* Header: Tiêu đề + Bộ lọc */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-[#333333]">Task List</h2>
+                <h2 className="text-lg font-semibold text-[#333333]">Danh sách nhiệm vụ</h2>
                 <Badge variant="secondary">{tasks.length}</Badge>
               </div>
               
@@ -258,7 +258,7 @@ export function TaskSettings() {
             {tasks.length === 0 ? (
               <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-100 rounded-xl">
                 <FileText className="w-10 h-10 mx-auto mb-2 opacity-20" />
-                <p>No tasks found.</p>
+                <p>Không tìm thấy nhiệm vụ nào.</p>
               </div>
             ) : (
               <div className="space-y-3">

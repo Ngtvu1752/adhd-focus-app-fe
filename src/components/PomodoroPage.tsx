@@ -122,7 +122,7 @@ export function PomodoroPage({ currentTask, onComplete }: PomodoroPageProps) {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <Star className="w-8 h-8" style={{ color: '#FFD966', fill: '#FFD966' }} />
-            <h1 style={{ color: '#333333' }}>Focus Time!</h1>
+            <h1 style={{ color: '#333333' }}>Giờ tập trung!</h1>
             <Star className="w-8 h-8" style={{ color: '#FFD966', fill: '#FFD966' }} />
           </div>
           {currentTask && (
@@ -241,7 +241,7 @@ export function PomodoroPage({ currentTask, onComplete }: PomodoroPageProps) {
               }}
             >
               <RotateCcw className="w-6 h-6 mr-2" />
-              Reset
+              Đặt lại
             </Button>
           </div>
         </motion.div>
@@ -256,7 +256,7 @@ export function PomodoroPage({ currentTask, onComplete }: PomodoroPageProps) {
         >
           <div className="flex items-center justify-center gap-2 mb-3">
             <Award className="w-6 h-6" style={{ color: '#FFD966' }} />
-            <h3 style={{ color: '#333333' }}>Stars Earned Today</h3>
+            <h3 style={{ color: '#333333' }}>Sao đạt được hôm nay</h3>
           </div>
           <div className="flex justify-center gap-2">
             {[...Array(5)].map((_, i) => (

@@ -80,7 +80,7 @@ const SignUpForm = ({ isParent, setIsParent }) => {
               className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-sm bg-neutral-light focus:outline-none focus:border-accent focus:bg-white peer"
             />
             <label className="absolute left-4 top-3 text-text-primary/60 text-sm pointer-events-none bg-transparent peer-focus:-top-2.5 peer-focus:bg-white peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:text-xs">
-              Last Name
+              Họ
             </label>
           </div>
           <div className="relative w-1/2">
@@ -90,7 +90,7 @@ const SignUpForm = ({ isParent, setIsParent }) => {
               className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-sm bg-neutral-light focus:outline-none focus:border-accent focus:bg-white peer"
             />
             <label className="absolute left-4 top-3 text-text-primary/60 text-sm pointer-events-none bg-transparent peer-focus:-top-2.5 peer-focus:bg-white peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:text-xs">
-              First Name
+              Tên
             </label>
           </div>
         </div>
@@ -102,7 +102,7 @@ const SignUpForm = ({ isParent, setIsParent }) => {
             className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl text-sm bg-neutral-light focus:outline-none focus:border-accent focus:bg-white peer"
           />
           <label className="absolute left-4 top-3 text-text-primary/60 text-sm pointer-events-none bg-transparent peer-focus:-top-2.5 peer-focus:bg-white peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:text-xs">
-            Username
+            Tên đăng nhập
           </label>
         </div>
         
@@ -115,7 +115,7 @@ const SignUpForm = ({ isParent, setIsParent }) => {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full py-4 px-5 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 bg-neutral-light focus:outline-none focus:border-overlay-start focus:bg-white focus:-translate-y-0.5 focus:shadow-[0_5px_15px_rgba(74,144,226,0.2)] peer"
           />
-          <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
+          <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-transparent px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
             Mật khẩu
           </label>
         </div>
@@ -129,7 +129,7 @@ const SignUpForm = ({ isParent, setIsParent }) => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full py-4 px-5 border-2 border-gray-200 rounded-xl text-sm transition-all duration-300 bg-neutral-light focus:outline-none focus:border-overlay-start focus:bg-white focus:-translate-y-0.5 focus:shadow-[0_5px_15px_rgba(74,144,226,0.2)] peer"
           />
-          <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-white px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
+          <label className="absolute left-5 top-4 text-text-primary/60 text-sm transition-all duration-300 pointer-events-none bg-transparent px-1 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-accent peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-accent">
             Nhập lại mật khẩu
           </label>
         </div>
